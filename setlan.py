@@ -8,7 +8,7 @@
 #!/usr/bin/env python
 
 import ply.lex as lex
-import sys, traceback
+import sys
 
 # Palabras reservadas del lenguaje
 reserved = {
