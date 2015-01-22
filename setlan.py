@@ -35,10 +35,6 @@ reserved = {
     'print' : 'Print',
     'println' : 'Println',
 
-    # Funciones
-    'def' : 'Def',
-    'return' : 'Return',
-
     # Tipos
     'int' : 'Int',
     'bool' : 'Boolean',
@@ -65,9 +61,6 @@ tokens = [
     'TimesMap',
     'DivideMap',
     'ModuleMap',
-
-    # Retorno de funcion
-    'Arrow',
 
     # Cadena de caracteres
     'String',
@@ -119,7 +112,6 @@ t_MinusMap = r'<->'
 t_TimesMap = r'<\*>'
 t_DivideMap = r'</>'
 t_ModuleMap = r'<%>'
-t_Arrow = r'->'
 t_String = r'"([^"\\]|\\"|\\\\|\\n|\\t|\\r|\\f|\\v)*"'
 t_Union = r'\+\+'
 t_Intersection = r'><'
