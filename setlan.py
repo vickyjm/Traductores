@@ -86,13 +86,13 @@ tokens = [
     'Greater',
     'GreaterEqual',
     'LessEqual',
-    'Equivalence',
+    'Equals',
     'NotEqual',
 
     # Lenguaje
     'Number',
     'Comma',
-    'Equals',
+    'Assign',
     'Semicolon',
     'OpenCurly',
     'CloseCurly',
@@ -132,7 +132,7 @@ t_Less = r'>'
 t_Greater = r'<'
 t_GreaterEqual = r'>='
 t_LessEqual = r'<='
-t_Equivalence = r'=='
+t_Equals = r'=='
 t_NotEqual = r'/='
 
 # Retorna el valor de un numero usando el tipo int de Python
@@ -142,7 +142,7 @@ def t_Number(t):
     return t
 
 t_Comma = r','
-t_Equals = r'='
+t_Assign = r'='
 t_Semicolon = r';'
 t_OpenCurly = r'\{'
 t_CloseCurly = r'\}'
@@ -205,7 +205,7 @@ if __name__ == '__main__':
             print str(find_column(lexer.lexdata,aux))
     else:
         for aux in tokList:
-            if (aux.type == 'ID') or (aux.type == 'String'):
+            if (aux.type == 'ID') or (aux.type == 'String') or (aux.type == 'Number'):
                 print 'Token' + str(aux.type) +': "' +str(aux.value)+'"(Linea ',
                 print  str(aux.lineno) +', Columna '+ str(find_column(lexer.lexdata,aux))+')'
             else:
