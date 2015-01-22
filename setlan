@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 #######################################
 # CI3715 Traductores e Interpretadores
@@ -120,7 +121,7 @@ t_TimesMap = r'<\*>'
 t_DivideMap = r'</>'
 t_ModuleMap = r'<%>'
 t_Arrow = r'->'
-t_String = r'".*?"'
+t_String = r'"([^"\\]|\\"|\\\\|\\n|\\t|\\r|\\f|\\v)*"'
 t_Union = r'\+\+'
 t_Intersection = r'><'
 t_Diference = r'\\'
@@ -205,10 +206,13 @@ if __name__ == '__main__':
             print str(find_column(lexer.lexdata,aux))
     else:
         for aux in tokList:
-            if (aux.type == 'ID') or (aux.type == 'String') or (aux.type == 'Number'):
-                print 'Token' + str(aux.type) +': "' +str(aux.value)+'"(Linea ',
+            if (aux.type == 'ID') or (aux.type == 'Number'):
+                print 'Token' + str(aux.type) +': "' + str(aux.value) +'" (Linea ',
+                print  str(aux.lineno) +', Columna '+ str(find_column(lexer.lexdata,aux))+')'
+            elif (aux.type == 'String'):
+                print 'Token' + str(aux.type) +': ' + str(aux.value) +' (Linea ',
                 print  str(aux.lineno) +', Columna '+ str(find_column(lexer.lexdata,aux))+')'
             else:
-                print 'Token'+str(aux.type)+'(Linea ' + str(aux.lineno) +', Columna ',
+                print 'Token'+str(aux.type)+' (Linea ' + str(aux.lineno) +', Columna ',
                 print str(find_column(lexer.lexdata,aux))+')'
     myfile.close()

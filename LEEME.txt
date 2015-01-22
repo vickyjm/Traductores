@@ -22,3 +22,8 @@ entrada para el lexer. Si al terminar el análisis la lista con los errores no e
 se imprimen todos los errores y nada más, con la línea y columna donde se encontró cada
 uno de ellos. En caso contrario se imprimen todos los tokens encontrados y su ubicación
 (línea y columna).
+
+NOTA: si el programa del lenguaje Setlan se escribe utilizando tabuladores en vez
+de espacios en blanco, un tab se cuenta como una columna. Esto puede afectar
+la columna que se imprime por cada token, da un resultado diferente si el programa
+se escribe con espacios en blanco.
