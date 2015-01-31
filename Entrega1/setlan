@@ -89,7 +89,6 @@ tokens = [
     'Semicolon',
     'OpenCurly',
     'CloseCurly',
-    'Colon',
     'Rparen',
     'Lparen',
 
@@ -112,7 +111,12 @@ t_MinusMap = r'<->'
 t_TimesMap = r'<\*>'
 t_DivideMap = r'</>'
 t_ModuleMap = r'<%>'
-t_String = r'"([^"\\]|\\"|\\\\|\\n)*"'
+
+def t_String(t):
+    r'"([^"\\]|\\"|\\\\|\\n)*"'
+    t.value = t.value[1:-1]
+    return t
+    
 t_Union = r'\+\+'
 t_Intersection = r'><'
 t_Diference = r'\\'
@@ -138,7 +142,6 @@ t_Assign = r'='
 t_Semicolon = r';'
 t_OpenCurly = r'\{'
 t_CloseCurly = r'\}'
-t_Colon = r':'
 t_Lparen = r'\('
 t_Rparen  = r'\)'
 t_Plus    = r'\+'
