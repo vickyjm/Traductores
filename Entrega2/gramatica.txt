@@ -1,9 +1,9 @@
-#########################################
-# CI3715 Traductores e Interpretadores  #
-# Entrega 2. Grupo 6                    #
-# Maria Victoria Jorge 11-10495         # 
-# Enrique Iglesias 11-10477             #
-#########################################
+##########################################
+# CI3715 Traductores e Interpretadores   #
+# Entrega 2. Grupo 6                     #
+# Maria Victoria Jorge 11-10495          # 
+# Enrique Iglesias 11-10477              #
+##########################################
 
 S -> PROGRAM
 
