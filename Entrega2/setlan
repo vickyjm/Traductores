@@ -19,7 +19,6 @@ reserved = {
 
     # Condicionales
     'if' : 'IF',
-    'then' : 'THEN',
     'else' : 'ELSE',
 
     # Ciclos
