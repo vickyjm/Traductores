@@ -9,6 +9,7 @@
 
 import ply.lex as lex
 import sys
+import ply.yacc as yacc
 
 # Palabras reservadas del lenguaje
 reserved = {
@@ -172,6 +173,196 @@ def find_column(input,token):
 def t_error(t):
     error.append(t)
     t.lexer.skip(1)
+
+class Program:
+    def __init__(self,Inst):
+        self.Inst = Inst
+
+class Bloque:
+    def __init__(self,exp):
+        self.exp = exp
+
+class Declarar:
+    def __init__(self,var):
+        self.var = var
+
+class Condicional:
+    def __init__(self, cond, inst, inst2):
+        self.cond = cond
+        self.inst = inst
+        self.inst2 = inst2
+
+class Asignacion:
+    def __init__(self,var,valor):
+        self.var = var
+        self.valor = valor
+
+class For:
+    def __init__(self, id1, direc, id2, inst):
+        self.id1 = id1
+        self.direc = direc
+        self,id2 = id2
+        self.inst = inst
+
+class While:
+    def __init__(self,exp,inst):
+        self.exp = exp
+        self.inst = inst
+
+class EntradaSalida:
+    def __init__(self,flag,exp):
+        self.flag = flag
+        self.exp = exp
+
+class Opbin:
+    def __init__(self,izq,op,der):
+        self.izq = izq
+        self.op = op
+        self.der = der
+
+class Tipos:
+    def __init__(self,tipo,valor):
+        self.tipo = tipo
+        self.valor = valor
+
+class Repeat:
+    def __init__(self,flag,inst1,exp,inst2):
+        self.flag = flag
+        self.inst1 = inst1
+        self.exp = exp
+        self.inst2 = inst2
+
+class Uniop:
+    def __init__(self,op,val):
+        self.val = val
+        self.op = op
+
+class CadenaString:
+    def __init__(self,def):
+        self.string = string
+
+precedence = (
+    ('nonassoc', 'UMINUS', 'MinSet', 'MaxSet', 'Size'),
+    ('nonassoc', 'TimesMap','DivideMap','ModuleMap'),
+    ('nonassoc','PlusMap','MinusMap'),
+    ('left','Intersection'),
+    ('left','Union','Diference'),
+    ('left','Times','Divide','Module')
+    ('left', 'Plus', 'Minus'),
+    ('nonassoc','Greater','GreaterEqual', 'Less','LessEqual'),
+    ('left','Equals','NotEqual'),
+    ('nonassoc','At'))
+
+def p_program(p):
+    '''PROGRAM : 'Program' INST'''
+    p[0] = Program(p[1])
+
+def p_tipos(p):
+    ''' TIPOS   : 'Int' 
+                | 'Set' 
+                | 'Bool' '''
+    p[0] = p[1]
+
+def p_enumList(p): # ['Hola',x,'chao']
+    '''ENUM_LIST    : STRING_LIST
+                    | EXP
+                    | ENUM_LIST 'Comma' ENUM_LIST'''
+    if (len(p)==2):
+        p[0] = p[1]
+    else:
+        p[0] = [[p[1],p[3]] 
+
+def p_StringList(p):
+    '''STRING_LIST -> 'string' 'Comma' STRING_LIST
+                    | 'string' '''
+    if (len(p)==3):
+        p[0] = [CadenaString(p[1]),p[3]]
+    else:
+        p[0] = CadenaString(p[1])
+
+def p_declarar(p):
+    '''DECLARAR : 'Using' DEC_LIST 'In'
+                | Epsilon'''
+    if (len(p)==4):
+        p[0] = Declarar([p[2]])
+
+
+def p_decList(p):
+    '''DEC_LIST   : TIPOS COMA_LIST 'Semicolon' DEC_LIST
+                  | TIPOS COMA_LIST 'Semicolon' '''
+    if (len(p)==4):
+        p[0] = Tipos(p[1],p[2])
+    else:
+        p[0] = [Tipos(p[1],p[2]),p[4]]
+
+def p_listInst(p):
+    '''INST_LIST    : INST 'Semicolon' LIST_INST
+                    | INST 'Semicolon' '''
+    if (len(p)==3):
+        p[0] = p[1]
+    else:
+        p[0] = [p[1],p[2]]
+
+def p_comaList(p):
+    '''COMA_LIST    : 'Id' 'Comma' COMA_LIST
+                    | 'Id' '''
+    if (len(p)==2):
+        p[0] = p[1]
+    else:
+        p[0] = [p[1],p[3]]
+
+def p_exp(p):
+    '''EXP  :  'Number'
+            | 'Id'
+            | 'Lparen' EXP 'Rparen'
+            | 'Minus' EXP
+            | EXP 'Plus' EXP
+            | EXP 'Minus' EXP
+            | EXP 'Times' EXP
+            | EXP 'Divide' EXP
+            | EXP 'Module' EXP
+            | EXP 'PlusMap' EXP
+            | EXP 'MinusMap' EXP
+            | EXP 'TimesMap' EXP
+            | EXP 'DivideMap' EXP
+            | EXP 'ModuleMap' EXP
+            | 'MaxSet' EXP
+            | 'MinSet' EXP
+            | 'Size' EXP
+            | 'True'
+            | 'False' 
+            | EXP 'And' EXP
+            | EXP 'Or' EXP
+            | 'Not' EXP
+            | EXP 'Equals' EXP
+            | EXP 'Greater' EXP
+            | EXP 'GreaterEqual' EXP
+            | EXP 'Less' EXP
+            | EXP 'LessEqual' EXP
+            | EXP 'NotEqual' EXP
+            | EXP 'At' EXP '''
+
+    if (len(p)==2): #Aqui va number, id, true, false
+        if type(p[1]) is int:
+            tipo = 'int'
+        elif type(p[1]) is str:
+            tipo = 'id'
+        else:
+            tipo = 'bool'
+        p[0] = Tipos(tipo,p[1])
+
+    elif (len(p)==3): #Operadores unarios
+        p[0] = Uniop(p[1],p[2])
+    else: #Operadores binarios
+        if (p[1]=='('): # Caso (EXP)
+            p[0] = p[2]
+        else:
+            p[0] = Opbin(p[1],p[2],p[3])
+
+
+def p_inst(p):
+    '''INST -> id = EXP
+        | {}'''
 
 if __name__ == '__main__':
 

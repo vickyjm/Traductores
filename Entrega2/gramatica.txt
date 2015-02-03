@@ -34,7 +34,10 @@ TIPOS -> 'int'
 INST_LIST -> INST; LIST_INST
 		   | INST;
 
-ENUM_LIST -> 'string'
+STRING_LIST -> 'string' STRING_LIST
+			| 'string'
+
+ENUM_LIST -> STRING_LIST
 		   | EXP
 		   | ENUM_LIST ',' ENUM_LIST
 
