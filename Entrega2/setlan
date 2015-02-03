@@ -112,7 +112,7 @@ t_DivideMap = r'</>'
 t_ModuleMap = r'<%>'
 
 def t_String(t):
-    r'"([^"\\]|\\"|\\\\|\\n)*"'
+    r'"([^"\\\n]|\\"|\\\\|\\n)*"'
     t.value = t.value[1:-1]
     return t
     
@@ -182,6 +182,7 @@ if __name__ == '__main__':
     lexer = lex.lex()
 
     if (len(sys.argv) != 2):
+        print "Error con los argumentos de entrada"
         sys.exit(1)
 
     myfile = open(sys.argv[1], "r")
@@ -194,8 +195,8 @@ if __name__ == '__main__':
 
     if (len(error) != 0):
         for aux in error :
-            print 'Error: Se encontro un caracter inesperado "' + str(aux.value[0]),
-            print '" en la Linea ' + str(aux.lineno) +' ,Columna ',
+            print 'Error: Se encontro un caracter inesperado ' + str(aux.value[0]),
+            print ' en la Linea ' + str(aux.lineno) +' ,Columna ',
             print str(find_column(lexer.lexdata,aux))
     else:
         for aux in tokList:
