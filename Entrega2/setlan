@@ -115,7 +115,7 @@ def t_String(t):
     r'"([^"\\\n]|\\"|\\\\|\\n)*"'
     t.value = t.value[1:-1]
     return t
-    
+
 t_Union = r'\+\+'
 t_Intersection = r'><'
 t_Diference = r'\\'

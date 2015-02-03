@@ -19,7 +19,6 @@ reserved = {
 
     # Condicionales
     'if' : 'IF',
-    'then' : 'THEN',
     'else' : 'ELSE',
 
     # Ciclos
@@ -113,7 +112,7 @@ t_DivideMap = r'</>'
 t_ModuleMap = r'<%>'
 
 def t_String(t):
-    r'"([^"\\]|\\"|\\\\|\\n)*"'
+    r'"([^"\\\n]|\\"|\\\\|\\n)*"'
     t.value = t.value[1:-1]
     return t
     
