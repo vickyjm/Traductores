@@ -46,7 +46,6 @@ DIRECCION -> 'min'
 
 NUMBER_LIST -> 'number' ',' NUMBERLIST
 			| 'number'
-			| Epsilon
 
 EXP ->	'number'
 	 | 'id'
@@ -63,6 +62,9 @@ EXP ->	'number'
 	 | EXP '<*>' EXP
 	 | EXP '</>' EXP
 	 | EXP '<%>' EXP
+	 | EXP '++' EXP
+	 | EXP '><' EXP
+	 | EXP '\' EXP
 	 | '>?' EXP
 	 | '<?' EXP
 	 | '$?' EXP

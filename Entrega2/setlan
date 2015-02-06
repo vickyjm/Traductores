@@ -349,7 +349,7 @@ def p_program(p):
 def p_tipos(p):
     ''' TIPOS   : Int 
                 | Set 
-                | Bool '''
+                | Boolean '''
     p[0] = p[1]
 
 def p_enumList(p): # ['Hola',x,'chao']
@@ -371,9 +371,13 @@ def p_StringList(p):
 
 def p_declarar(p):
     '''DECLARAR : Using DEC_LIST In
-                | Epsilon'''
+                | EPSILON'''
     if (len(p)==4):
         p[0] = Declarar([p[2]])
+
+def p_epsilon(p):
+    ''' EPSILON : '''
+    pass
 
 
 def p_decList(p):
@@ -384,8 +388,8 @@ def p_decList(p):
     else:
         p[0] = [Tipos(p[1],p[2]),p[4]]
 
-def p_listInst(p):
-    '''INST_LIST    : INST Semicolon LIST_INST
+def p_instList(p):
+    '''INST_LIST    : INST Semicolon INST_LIST
                     | INST Semicolon '''
     if (len(p)==3):
         p[0] = p[1]
@@ -393,8 +397,8 @@ def p_listInst(p):
         p[0] = [p[1],p[2]]
 
 def p_comaList(p):
-    '''COMA_LIST    : Id Comma COMA_LIST
-                    | Id '''
+    '''COMA_LIST    : ID Comma COMA_LIST
+                    | ID '''
     if (len(p)==2):
         p[0] = p[1]
     else:
@@ -402,10 +406,10 @@ def p_comaList(p):
 
 def p_exp(p):
     '''EXP  : Number
-            | Id
+            | ID
             | OpenCurly NUMBER_LIST CloseCurly
             | Lparen EXP Rparen
-            | Minus EXP
+            | Minus EXP %prec UMINUS
             | EXP Plus EXP
             | EXP Minus EXP
             | EXP Times EXP
@@ -416,6 +420,9 @@ def p_exp(p):
             | EXP TimesMap EXP
             | EXP DivideMap EXP
             | EXP ModuleMap EXP
+            | EXP Union EXP
+            | EXP Intersection EXP
+            | EXP Diference EXP
             | MaxSet EXP
             | MinSet EXP
             | Size EXP
@@ -453,14 +460,14 @@ def p_exp(p):
 
 
 def p_inst(p):
-    '''INST : Id Assign EXP
+    '''INST : ID Assign EXP
             | OpenCurly DECLARAR INST_LIST CloseCurly
-            | Scan Id
+            | Scan ID
             | Print ENUM_LIST
             | Println ENUM_LIST
             | IF Lparen EXP Rparen INST ELSE INST
-            | If Lparen EXP Rparen INST
-            | FOR Id DIRECCION Id DO INST
+            | IF Lparen EXP Rparen INST
+            | FOR ID DIRECCION ID DO INST
             | REPEAT INST WHILE EXP
             | REPEAT INST WHILE EXP DO INST
             | WHILE EXP DO INST'''
@@ -492,9 +499,8 @@ def p_direccion(p):
     p[0] = p[1]
 
 def p_numberList(p):
-    '''NUMBER_LIST  : Number Comma NUMBERLIST
-                    | Number
-                    | Epsilon '''
+    '''NUMBER_LIST  : Number Comma NUMBER_LIST
+                    | Number'''
     if (len(p)==2):
         p[0] = p[1]
     else:
