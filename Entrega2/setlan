@@ -175,16 +175,32 @@ def t_error(t):
     t.lexer.skip(1)
 
 class Program:
-    def __init__(self,Inst):
-        self.Inst = Inst
+    def __init__(self,inst):
+        self.inst = inst
+
+    def toString(self):
+        return 'PROGRAM\n' + self.inst.toString(2)
 
 class Bloque:
     def __init__(self,exp):
         self.exp = exp
 
+    def toString(self,tabs):
+        string = ' '*tabs + 'BLOCK_BEGIN\n'
+        string += ' '*(tabs + 2) + self.exp.toString(tabs + 2) + '\n'
+        string += ' '*tabs + 'BLOCK_END\n'
+        return string
+
 class Declarar:
     def __init__(self,var):
         self.var = var
+
+    def toString(self,tabs):
+        string = ' '*tabs + 'USING\n'
+        string += ' '*(tabs + 2) + self.var.toString(tabs + 2) + '\n'
+        string += ' '*tabs + 'IN\n'
+        return string
+
 
 class Condicional:
     def __init__(self, cond, inst, inst2):
@@ -192,10 +208,19 @@ class Condicional:
         self.inst = inst
         self.inst2 = inst2
 
+    def toString(self,tabs):
+
 class Asignacion:
     def __init__(self,var,valor):
         self.var = var
         self.valor = valor
+
+    def toString(self,tabs):
+        string = ' '*tabs + 'ASSIGN\n'
+        string += ' '*(tabs + 2) + 'variable\n'
+        string += ' '*(tabs + 4) + self.var + '\n'
+        string += ' '*(tabs + 6) + self.valor.toString(tabs + 6) + '\n'
+        return string
 
 class For:
     def __init__(self, id1, direc, id2, inst):
@@ -214,16 +239,60 @@ class EntradaSalida:
         self.flag = flag
         self.exp = exp
 
+    def toString(self,tabs):
+        string = ' '*tabs + self.flag.upper() + '\n'
+        if (self.flag=='scan'):
+            string += ' '*(tabs + 2) + 'variable\n'
+            string += ' '*(tabs + 4) + self.exp.toString(tabs + 4)
+        else:
+            string += ' '*(tabs + 2) 'elements\n'
+            for elem in exp:
+                string += ' '*(tabs + 4) + self.exp.toString(tabs + 4) + '\n'
+        return string
+
 class Opbin:
     def __init__(self,izq,op,der):
         self.izq = izq
         self.op = op
         self.der = der
 
+    def toString(self,tabs):
+        operadores = {
+            '+'     : 'PLUS',
+            '-'     : 'MINUS',
+            '*'     : 'TIMES',
+            '/'     : 'DIVIDE',
+            '%'     : 'MODULE',
+            '++'    : 'UNION',
+            '><'    : 'INTERSECTION',
+            '\\'    : 'DIFERENCE',
+            '<+>'   : 'PLUS_MAP',
+            '<->'   : 'MINUS_MAP',
+            '<*>'   : 'TIMES_MAP',
+            '</>'   : 'DIVIDE_MAP',
+            '<%>'   : 'MODULE_MAP',
+            '<'     : 'LESS',
+            '<='    : 'LESS_EQUAL',
+            '>'     : 'GREATER',
+            '>='    : 'GREATER_EQUAL',
+            '=='    : 'EQUALS',
+            '/='    : 'NOT_EQUAL',
+            '@'     : 'AT'
+        }
+        string = operadores[self.op] + '\n'
+        string += ' '*(tabs + 2) + 'variable' + '\n'
+        string += self.izq.toString(tabs + 4) + '\n'
+        string += ' '*(tabs + 2) 'variable' + '\n'
+        string += self.der.toString(tabs + 4) + '\n'
+        return string
+
 class Tipos:
     def __init__(self,tipo,valor):
         self.tipo = tipo
         self.valor = valor
+
+    def toString(self,tabs):
+
 
 class Repeat:
     def __init__(self,flag,inst1,exp,inst2):
@@ -232,14 +301,32 @@ class Repeat:
         self.exp = exp
         self.inst2 = inst2
 
+    def toString(self,tabs):
+
+
 class Uniop:
     def __init__(self,op,val):
         self.val = val
         self.op = op
 
+    def toString(self,tabs):
+        operadores = {
+            '-'     : 'UMINUS',
+            '<?'    : 'MIN_SET',
+            '>?'    : 'MAX_SET',
+            '$?'    : 'SIZE'
+        }
+        string = ' '*tabs + operadores[self.op] + '\n'
+        string += ' '*(tabs + 2) + self.val.toString(tabs + 2) + '\n'
+        return string
+
+
 class CadenaString:
     def __init__(self,def):
         self.string = string
+
+    def toString(self,tabs):
+
 
 precedence = (
     ('nonassoc', 'UMINUS', 'MinSet', 'MaxSet', 'Size'),
@@ -254,93 +341,94 @@ precedence = (
     ('nonassoc','At'))
 
 def p_program(p):
-    '''PROGRAM : 'Program' INST'''
+    '''PROGRAM : Program INST'''
     p[0] = Program(p[1])
 
 def p_tipos(p):
-    ''' TIPOS   : 'Int' 
-                | 'Set' 
-                | 'Bool' '''
+    ''' TIPOS   : Int 
+                | Set 
+                | Bool '''
     p[0] = p[1]
 
 def p_enumList(p): # ['Hola',x,'chao']
     '''ENUM_LIST    : STRING_LIST
                     | EXP
-                    | ENUM_LIST 'Comma' ENUM_LIST'''
+                    | ENUM_LIST Comma ENUM_LIST'''
     if (len(p)==2):
         p[0] = p[1]
     else:
-        p[0] = [[p[1],p[3]] 
+        p[0] = [p[1],p[3]] 
 
 def p_StringList(p):
-    '''STRING_LIST -> 'string' 'Comma' STRING_LIST
-                    | 'string' '''
+    '''STRING_LIST -> String Comma STRING_LIST
+                    | String '''
     if (len(p)==3):
         p[0] = [CadenaString(p[1]),p[3]]
     else:
         p[0] = CadenaString(p[1])
 
 def p_declarar(p):
-    '''DECLARAR : 'Using' DEC_LIST 'In'
+    '''DECLARAR : Using DEC_LIST In
                 | Epsilon'''
     if (len(p)==4):
         p[0] = Declarar([p[2]])
 
 
 def p_decList(p):
-    '''DEC_LIST   : TIPOS COMA_LIST 'Semicolon' DEC_LIST
-                  | TIPOS COMA_LIST 'Semicolon' '''
+    '''DEC_LIST   : TIPOS COMA_LIST Semicolon DEC_LIST
+                  | TIPOS COMA_LIST Semicolon '''
     if (len(p)==4):
         p[0] = Tipos(p[1],p[2])
     else:
         p[0] = [Tipos(p[1],p[2]),p[4]]
 
 def p_listInst(p):
-    '''INST_LIST    : INST 'Semicolon' LIST_INST
-                    | INST 'Semicolon' '''
+    '''INST_LIST    : INST Semicolon LIST_INST
+                    | INST Semicolon '''
     if (len(p)==3):
         p[0] = p[1]
     else:
         p[0] = [p[1],p[2]]
 
 def p_comaList(p):
-    '''COMA_LIST    : 'Id' 'Comma' COMA_LIST
-                    | 'Id' '''
+    '''COMA_LIST    : Id Comma COMA_LIST
+                    | Id '''
     if (len(p)==2):
         p[0] = p[1]
     else:
         p[0] = [p[1],p[3]]
 
 def p_exp(p):
-    '''EXP  :  'Number'
-            | 'Id'
-            | 'Lparen' EXP 'Rparen'
-            | 'Minus' EXP
-            | EXP 'Plus' EXP
-            | EXP 'Minus' EXP
-            | EXP 'Times' EXP
-            | EXP 'Divide' EXP
-            | EXP 'Module' EXP
-            | EXP 'PlusMap' EXP
-            | EXP 'MinusMap' EXP
-            | EXP 'TimesMap' EXP
-            | EXP 'DivideMap' EXP
-            | EXP 'ModuleMap' EXP
-            | 'MaxSet' EXP
-            | 'MinSet' EXP
-            | 'Size' EXP
-            | 'True'
-            | 'False' 
-            | EXP 'And' EXP
-            | EXP 'Or' EXP
-            | 'Not' EXP
-            | EXP 'Equals' EXP
-            | EXP 'Greater' EXP
-            | EXP 'GreaterEqual' EXP
-            | EXP 'Less' EXP
-            | EXP 'LessEqual' EXP
-            | EXP 'NotEqual' EXP
-            | EXP 'At' EXP '''
+    '''EXP  : Number
+            | Id
+            | OpenCurly NUMBER_LIST CloseCurly
+            | Lparen EXP Rparen
+            | Minus EXP
+            | EXP Plus EXP
+            | EXP Minus EXP
+            | EXP Times EXP
+            | EXP Divide EXP
+            | EXP Module EXP
+            | EXP PlusMap EXP
+            | EXP MinusMap EXP
+            | EXP TimesMap EXP
+            | EXP DivideMap EXP
+            | EXP ModuleMap EXP
+            | MaxSet EXP
+            | MinSet EXP
+            | Size EXP
+            | True
+            | False 
+            | EXP And EXP
+            | EXP Or EXP
+            | Not EXP
+            | EXP Equals EXP
+            | EXP Greater EXP
+            | EXP GreaterEqual EXP
+            | EXP Less EXP
+            | EXP LessEqual EXP
+            | EXP NotEqual EXP
+            | EXP At EXP '''
 
     if (len(p)==2): #Aqui va number, id, true, false
         if type(p[1]) is int:
@@ -356,22 +444,24 @@ def p_exp(p):
     else: #Operadores binarios
         if (p[1]=='('): # Caso (EXP)
             p[0] = p[2]
+        elif (p[1]=='{'):
+            p[0] = Tipos('set',p[2])
         else:
             p[0] = Opbin(p[1],p[2],p[3])
 
 
 def p_inst(p):
-    '''INST : 'Id' '=' EXP
-            | '{' DECLARAR INST_LIST '}'
-            | 'scan' 'Id'
-            | 'print' ENUM_LIST
-            | 'println' ENUM_LIST
-            | 'if' '(' EXP ')' INST 'else' INST
-            | 'if' '(' EXP ')' INST
-            | 'for' 'Id' DIRECCION 'Id' 'do' INST
-            | 'repeat' INST 'while' EXP
-            | 'repeat' INST 'while' EXP 'do' INST
-            | 'while' EXP 'do' INST'''
+    '''INST : Id = EXP
+            | { DECLARAR INST_LIST }
+            | scan Id
+            | print ENUM_LIST
+            | println ENUM_LIST
+            | if ( EXP ) INST else INST
+            | if ( EXP ) INST
+            | for Id DIRECCION Id do INST
+            | repeat INST while EXP
+            | repeat INST while EXP do INST
+            | while EXP do INST'''
 
     if (len(p) == 4):
         p[0] = Asignacion(p[1],p[3])
@@ -395,12 +485,22 @@ def p_inst(p):
         p[0] = Condicional(p[3],p[5],p[7])
 
 def p_direccion(p):
-    ''' DIRECCION : 'min'
-                  | 'max' '''
+    ''' DIRECCION : Min
+                  | Max '''
     p[0] = p[1]
 
+def p_numberList(p):
+    '''NUMBER_LIST  : Number Comma NUMBERLIST
+                    | Number
+                    | Epsilon '''
+    if (len(p)==2):
+        p[0] = p[1]
+    else:
+        p[0] = [p[1],p[2]]
+
 def p_error(p):
-    print('ERROR:')
+    if (p is not None):
+        print 'Error de sintaxis. Se encontró el token "'+ p.value +'" en la línea '+ p.lineno +', columna '+ find_column(myfile.read(),p)
 
 if __name__ == '__main__':
 
@@ -428,11 +528,7 @@ if __name__ == '__main__':
             print ' en la Linea ' + str(aux.lineno) +' ,Columna ',
             print str(find_column(lexer.lexdata,aux))
     else:
-        for aux in tokList:
-            if (aux.type == 'ID') or (aux.type == 'String') or (aux.type == 'Number'):
-                print 'Token' + str(aux.type) +': "' +str(aux.value)+'"(Linea ',
-                print  str(aux.lineno) +', Columna '+ str(find_column(lexer.lexdata,aux))+')'
-            else:
-                print 'Token'+str(aux.type)+'(Linea ' + str(aux.lineno) +', Columna ',
-                print str(find_column(lexer.lexdata,aux))+')'
+        parser = yacc.yacc()
+        salida = parser.parse(myfile.read())
+        salida.toString(0)
     myfile.close()
