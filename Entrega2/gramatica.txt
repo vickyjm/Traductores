@@ -44,8 +44,13 @@ ENUM_LIST -> STRING_LIST
 DIRECCION -> 'min'
 		   | 'max'
 
+NUMBER_LIST -> 'number' ',' NUMBERLIST
+			| 'number'
+			| Epsilon
+
 EXP ->	'number'
 	 | 'id'
+	 | '{' NUMBER_LIST '}'
 	 | '(' EXP ')'
 	 | '-' EXP
 	 | EXP '+' EXP
