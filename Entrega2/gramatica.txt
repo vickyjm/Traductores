@@ -37,9 +37,10 @@ INST_LIST -> INST; LIST_INST
 STRING_LIST -> 'string' STRING_LIST
 			| 'string'
 
-ENUM_LIST -> STRING_LIST
-		   | EXP
-		   | ENUM_LIST ',' ENUM_LIST
+ENUM_LIST -> STRING
+            | EXP
+            | ENUM_LIST Comma EXP
+            | ENUM_LIST Comma STRING
 
 DIRECCION -> 'min'
 		   | 'max'

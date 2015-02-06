@@ -330,6 +330,10 @@ class CadenaString:
 
 
 precedence = (
+    ('right','ELSE'),
+    ('left', 'And'),    
+    ('left', 'Or'),    
+    ('right', 'Not'),    
     ('nonassoc', 'UMINUS', 'MinSet', 'MaxSet', 'Size'),
     ('nonassoc', 'TimesMap','DivideMap','ModuleMap'),
     ('nonassoc','PlusMap','MinusMap'),
@@ -353,21 +357,22 @@ def p_tipos(p):
     p[0] = p[1]
 
 def p_enumList(p): # ['Hola',x,'chao']
-    '''ENUM_LIST    : STRING_LIST
+    '''ENUM_LIST    : String
                     | EXP
-                    | ENUM_LIST Comma ENUM_LIST'''
+                    | ENUM_LIST Comma EXP
+                    | ENUM_LIST Comma String'''
     if (len(p)==2):
         p[0] = p[1]
     else:
         p[0] = [p[1],p[3]] 
 
-def p_StringList(p):
-    '''STRING_LIST  : String Comma STRING_LIST
-                    | String '''
-    if (len(p)==3):
-        p[0] = [CadenaString(p[1]),p[3]]
-    else:
-        p[0] = CadenaString(p[1])
+#def p_StringList(p):
+#    '''STRING_LIST  : STRING_LIST Comma String
+#                    | String '''
+ #   if (len(p)==3):
+#       p[0] = [CadenaString(p[1]),p[3]]
+ #   else:
+  #      p[0] = CadenaString(p[1])
 
 def p_declarar(p):
     '''DECLARAR : Using DEC_LIST In
@@ -499,7 +504,7 @@ def p_direccion(p):
     p[0] = p[1]
 
 def p_numberList(p):
-    '''NUMBER_LIST  : Number Comma NUMBER_LIST
+    '''NUMBER_LIST  : NUMBER_LIST Comma Number 
                     | Number'''
     if (len(p)==2):
         p[0] = p[1]
