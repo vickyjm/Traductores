@@ -441,7 +441,6 @@ def p_decList(p):
 
 def p_instList(p):
     '''INST_LIST    : INST Semicolon INST_LIST
-                    | INST Semicolon
                     | EPSILON '''
     if (len(p)==3):
         p[0] = p[1]
