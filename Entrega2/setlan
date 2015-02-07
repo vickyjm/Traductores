@@ -493,7 +493,7 @@ def p_enumList(p):
         if (isinstance(p[3],str)):
             p[0] = ListaImpresion(p[1],CadenaString(p[3]))
         else:
-            p[0] = ListaImpresion(p[1],p[2])
+            p[0] = ListaImpresion(p[1],p[3])
 
 
 def p_declarar(p):
