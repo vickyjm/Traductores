@@ -31,16 +31,17 @@ TIPOS -> 'int'
 	   | 'set'
 	   | 'bool'
 
-INST_LIST -> INST; LIST_INST
-		   | INST;
+INST_LIST -> INST';' LIST_INST
+		   | INST';'
+		   | Epsilon
 
 STRING_LIST -> 'string' STRING_LIST
 			| 'string'
 
 ENUM_LIST -> STRING
             | EXP
-            | ENUM_LIST Comma EXP
-            | ENUM_LIST Comma STRING
+            | ENUM_LIST ',' EXP
+            | ENUM_LIST ',' STRING
 
 DIRECCION -> 'min'
 		   | 'max'
