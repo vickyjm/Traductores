@@ -220,7 +220,7 @@ class Condicional:
         string += ' '*(tabs + 2) + 'THEN\n'
         string += self.inst.toString(tabs + 4) 
         if (self.inst2 != None):
-            string += ' '*(tabs + 2) + 'ELSE'
+            string += ' '*(tabs + 2) + 'ELSE\n'
             string += self.inst2.toString(tabs + 4) 
         return string
 
@@ -314,8 +314,23 @@ class Opbin:
             '@'     : 'AT'
         }
         string = ' '*tabs + operadores[self.op] + '\n'
-        string += self.izq.toString(tabs + 2) 
-        string += self.der.toString(tabs + 2) 
+        if (isinstance(self.izq,Simple)):
+            if (self.izq.tipo=='id'):
+                string += ' '*(tabs + 2) + 'variable\n'
+                string += ' '*(tabs + 4) + self.izq + '\n'
+            else:
+                string += self.izq.toString(tabs + 2) 
+        else:
+            string += self.izq.toString(tabs + 2) 
+
+        if (isinstance(self.der,Simple)):
+            if (self.der.tipo=='id'):
+                string += ' '*(tabs + 2) + 'variable\n'
+                string += ' '*(tabs + 4) + self.der + '\n'
+            else:
+                string += self.der.toString(tabs + 2) 
+        else:
+            string += self.der.toString(tabs + 2) 
         return string
 
 class Simple:
@@ -565,7 +580,7 @@ def p_exp(p):
         if (p[1]=='('):
             p[0] = p[1]
         elif (p[1]=='{'):
-            Simple('set',p[2])
+            p[0] = Simple('set',p[2])
         else:
             p[0] = Opbin(p[1],p[2],p[3])
 
