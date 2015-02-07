@@ -447,8 +447,8 @@ class ListaImpresion:
 
     def toString(self,tabs):
         string = ''
-        if (self.listaExp!=None):
-            string += self.listaExp.toString(tabs)
+        if (self.listExp!=None):
+            string += self.listExp.toString(tabs)
         string += self.exp.toString(tabs)
         return string
         
