@@ -179,7 +179,7 @@ class Program:
     def __init__(self,inst):
         self.inst = inst
 
-    def toString(self):
+    def toString(self,tabs):
         return 'PROGRAM\n' + self.inst.toString(2)
 
 class Bloque:
@@ -362,7 +362,7 @@ class Uniop:
 
 
 class CadenaString:
-    def __init__(self,defi):
+    def __init__(self,string):
         self.string = string
 
    # def toString(self,tabs):
@@ -401,9 +401,15 @@ def p_enumList(p): # ['Hola',x,'chao']
                     | ENUM_LIST Comma EXP
                     | ENUM_LIST Comma String'''
     if (len(p)==2):
-        p[0] = p[1]
+        if (type(p) is str):
+            p[0] = CadenaString(p[1])
+        else:
+            p[0] = p[1]
     else:
-        p[0] = [p[1],p[3]] 
+        if (type(p) is str):
+            p[0] = [p[1],CadenaString(p[3])]
+        else:
+            p[0] = [p[1],p[3]] 
 
 #def p_StringList(p):
 #    '''STRING_LIST  : STRING_LIST Comma String
@@ -583,7 +589,7 @@ if __name__ == '__main__':
             print ' en la Linea ' + str(aux.lineno) +' ,Columna ',
             print str(find_column(lexer.lexdata,aux))
     else:
-        parser = yacc.yacc(start = 'program')
+        parser = yacc.yacc()
         out = parser.parse(data)
         out.toString(0)
     myfile.close()
