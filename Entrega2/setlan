@@ -233,10 +233,10 @@ class Asignacion:
         return string
 
 class For:
-    def __init__(self, id1, direc, id2, inst):
+    def __init__(self, id1, direc, exp, inst):
         self.id1 = id1
         self.direc = direc
-        self,id2 = id2
+        self.exp = exp
         self.inst = inst
 
     def toString(self,tabs):
@@ -326,7 +326,7 @@ class Tipos:
     def toString(self,tabs):
         string = ' '*tabs + self.tipo + '\n'
         string += ' '*(tabs + 2) + self.valor + '\n'
-    return string
+        return string
 
 class Repeat:
     def __init__(self,flag,inst1,exp,inst2):
@@ -510,7 +510,7 @@ def p_inst(p):
             | Println ENUM_LIST
             | IF Lparen EXP Rparen INST ELSE INST
             | IF Lparen EXP Rparen INST
-            | FOR ID DIRECCION ID DO INST
+            | FOR ID DIRECCION EXP DO INST
             | REPEAT INST WHILE EXP
             | REPEAT INST WHILE EXP DO INST
             | WHILE EXP DO INST'''

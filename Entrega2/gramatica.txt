@@ -16,7 +16,7 @@ INST -> 'id' '=' EXP
 	  | 'println' ENUM_LIST
 	  | 'if' '(' EXP ')' INST 'else' INST
 	  | 'if' '(' EXP ')' INST
-	  |	'for' 'id' DIRECCION 'id' 'do' INST
+	  |	'for' 'id' DIRECCION EXP 'do' INST
 	  | 'repeat' INST 'while' EXP
 	  | 'repeat' INST 'while' EXP 'do' INST
 	  |	'while' EXP 'do' INST
