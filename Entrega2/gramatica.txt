@@ -11,6 +11,7 @@ PROGRAM -> 'program' INST
 
 INST -> 'id' '=' EXP
 	  |	'{' DECLARAR INST_LIST '}'
+	  | '{' INST_LIST '}'
 	  |	'scan' 'id'
 	  | 'print' ENUM_LIST
 	  | 'println' ENUM_LIST
@@ -22,7 +23,6 @@ INST -> 'id' '=' EXP
 	  |	'while' EXP 'do' INST
 
 DECLARAR -> 'using' DEC_LIST 'in'
-		  | Epsilon
 
 DEC_LIST ->	TIPOS 'id'; DEC_LIST
 		  |	TIPOS 'id';

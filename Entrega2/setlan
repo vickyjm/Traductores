@@ -183,11 +183,14 @@ class Program:
         return 'PROGRAM\n' + self.inst.toString(2)
 
 class Bloque:
-    def __init__(self,exp):
+    def __init__(self,dec,exp):
         self.exp = exp
+        self.dec = dec
 
     def toString(self,tabs):
         string = ' '*tabs + 'BLOCK_BEGIN\n'
+        if (self.dec!=None):
+            string += ' '*(tabs + 2) + self.dec.toString(tabs + 2) + '\n'
         string += ' '*(tabs + 2) + self.exp.toString(tabs + 2) + '\n'
         string += ' '*tabs + 'BLOCK_END\n'
         return string
@@ -420,10 +423,8 @@ def p_enumList(p): # ['Hola',x,'chao']
   #      p[0] = CadenaString(p[1])
 
 def p_declarar(p):
-    '''DECLARAR : Using DEC_LIST In
-                | EPSILON'''
-    if (len(p)==4):
-        p[0] = Declarar([p[2]])
+    '''DECLARAR : Using DEC_LIST In'''
+    p[0] = Declarar([p[2]])
 
 def p_epsilon(p):
     ''' EPSILON : '''
@@ -515,6 +516,7 @@ def p_exp(p):
 def p_inst(p):
     '''INST : ID Assign EXP
             | OpenCurly DECLARAR INST_LIST CloseCurly
+            | OpenCurly INST_LIST CloseCurly
             | Scan ID
             | Print ENUM_LIST
             | Println ENUM_LIST
@@ -527,12 +529,15 @@ def p_inst(p):
 
     if (len(p) == 4):
         p[0] = Asignacion(p[1],p[3])
+    elif (p[1] == '{'):
+            if (len(p)==5):
+                p[0] = Bloque(p[2],p[3])
+            else:
+                p[0] = Bloque(None,p[3])
     elif (len(p) == 3):
         p[0] = EntradaSalida(p[1],p[2])
     elif (len(p) == 5):
-        if (p[1] == '{'):
-            p[0] = [p[2],[p[3]]]
-        elif(p[1] == 'repeat'):
+        if(p[1] == 'repeat'):
             p[0] = Repeat(p[1],p[2],p[4],None)
         else:
             p[0] = While(p[2],p[4])
