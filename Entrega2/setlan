@@ -341,6 +341,7 @@ class Repeat:
         string += ' '*tabs + 'WHILE\n'
         string += ' '*(tabs + 2) + 'condition\n'
         string += ' '*(tabs + 4) + self.exp.toString(tabs + 4) + '\n'
+        return string
         
 
 class Uniop:
