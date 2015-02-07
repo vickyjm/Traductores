@@ -584,7 +584,7 @@ def p_inst(p):
             | WHILE EXP DO INST'''
     if (len(p)==3):
         if (p[1]=='scan'):
-            p[0] = EntradaSalida(p[1],p[1])
+            p[0] = EntradaSalida(p[1],p[2])
         else:
             p[0] = EntradaSalida(p[1],p[2])
 
