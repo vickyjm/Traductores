@@ -578,7 +578,7 @@ def p_exp(p):
 
     else:
         if (p[1]=='('):
-            p[0] = p[1]
+            p[0] = p[2]
         elif (p[1]=='{'):
             p[0] = Simple('set',p[2])
         else:
