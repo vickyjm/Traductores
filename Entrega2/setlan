@@ -179,7 +179,7 @@ class Program:
     def __init__(self,inst):
         self.inst = inst
 
-    def toString(self):
+    def toString(self,tabs):
         return 'PROGRAM\n' + self.inst.toString(2)
 
 class Bloque:
@@ -583,7 +583,7 @@ if __name__ == '__main__':
             print ' en la Linea ' + str(aux.lineno) +' ,Columna ',
             print str(find_column(lexer.lexdata,aux))
     else:
-        parser = yacc.yacc(start = 'program')
+        parser = yacc.yacc()
         out = parser.parse(data)
         out.toString(0)
     myfile.close()
