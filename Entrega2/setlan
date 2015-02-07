@@ -190,9 +190,9 @@ class Bloque:
     def toString(self,tabs):
         string = ' '*tabs + 'BLOCK_BEGIN\n'
         if (self.dec!=None):
-            string += ' '*(tabs + 2) + self.dec.toString(tabs + 2) + '\n'
+            string += self.dec.toString(tabs + 2) + '\n'
         if (self.exp!=None):
-            string += ' '*(tabs + 2) + self.exp.toString(tabs + 2) + '\n'
+            string += self.exp.toString(tabs + 2) + '\n'
         string += ' '*tabs + 'BLOCK_END\n'
         return string
 
@@ -202,7 +202,7 @@ class Declarar:
 
     def toString(self,tabs):
         string = ' '*tabs + 'USING\n'
-        string += ' '*(tabs + 2) + self.var.toString(tabs + 2) + '\n'
+        string += self.var.toString(tabs + 2) + '\n'
         string += ' '*tabs + 'IN\n'
         return string
 
@@ -216,12 +216,12 @@ class Condicional:
     def toString(self,tabs):
         string = ' '*tabs + 'IF\n'
         string += ' '*(tabs + 2) + 'condition\n'
-        string += ' '*(tabs + 4) + self.cond.toString(tabs + 4) +'\n'
+        string += self.cond.toString(tabs + 4) +'\n'
         string += ' '*(tabs + 2) + 'THEN\n'
-        string += ' '*(tabs + 4) + self.inst.toString(tabs + 4) + '\n'
+        string += self.inst.toString(tabs + 4) + '\n'
         if (self.inst2 != None):
             string += ' '*(tabs + 2) + 'ELSE'
-            string += ' '*(tabs + 4) + self.inst2.toString(tabs + 4) + '\n'
+            string += self.inst2.toString(tabs + 4) + '\n'
         return string
 
 class Asignacion:
@@ -231,9 +231,8 @@ class Asignacion:
 
     def toString(self,tabs):
         string = ' '*tabs + 'ASSIGN\n'
-        string += ' '*(tabs + 2) + 'variable\n'
-        string += ' '*(tabs + 4) + self.var + '\n'
-        string += ' '*(tabs + 6) + self.valor.toString(tabs + 6) + '\n'
+        string += self.var.toString(tabs + 2) + '\n'
+        string += self.valor.toString(tabs + 6) + '\n'
         return string
 
 class For:
@@ -245,14 +244,13 @@ class For:
 
     def toString(self,tabs):
         string = ' '*tabs + 'FOR\n'
-        string += ' '*(tabs + 2) + 'variable\n'
-        string += ' '*(tabs + 4) + self.id1 +'\n'
+        string += self.id1.toString(tabs + 2) + '\n'
         string += ' '*(tabs + 2) + 'direction\n'
         string += ' '*(tabs + 4) + self.direc.lower() +'\n'
         string += ' '*(tabs + 2) + 'IN\n'
-        string += ' '*(tabs + 4) + self.id2.toString(tabs + 4) + '\n'
+        string += self.id2.toString(tabs + 4) + '\n'
         string += ' '*(tabs + 2) + 'DO\n'
-        string += ' '*(tabs + 4) + self.inst.toString(tabs + 4) + '\n'
+        string += self.inst.toString(tabs + 4) + '\n'
         return string
 
 class While:
@@ -263,9 +261,9 @@ class While:
     def toString(self,tabs):
         string = ' '*tabs + 'WHILE\n'
         string += ' '*(tabs + 2) + 'condition\n'
-        string += ' '*(tabs + 4) + self.exp.toString(tabs + 4) + '\n'
+        string += self.exp.toString(tabs + 4) + '\n'
         string += ' '*tabs + 'DO\n' 
-        string += ' '*(tabs + 2) + self.inst.toString(tabs + 2) + '\n'
+        string += self.inst.toString(tabs + 2) + '\n'
         return string
 
 class EntradaSalida:
@@ -276,11 +274,10 @@ class EntradaSalida:
     def toString(self,tabs):
         string = ' '*tabs + self.flag.upper() + '\n'
         if (self.flag=='scan'):
-            string += ' '*(tabs + 2) + 'variable\n'
-            string += ' '*(tabs + 4) + self.exp.toString(tabs + 4)
+            string += self.exp.toString(tabs + 2)
         else:
             string += ' '*(tabs + 2) + 'elements\n'
-            string += ' '*(tabs + 4) + self.exp.toString(tabs + 4) + '\n'
+            string += self.exp.toString(tabs + 4) + '\n'
             if (self.flag=='println'):
                 string += "'\n'"
         return string
@@ -314,11 +311,9 @@ class Opbin:
             '/='    : 'NOT_EQUAL',
             '@'     : 'AT'
         }
-        string = operadores[self.op] + '\n'
-        string += ' '*(tabs + 2) + 'variable' + '\n'
-        string += self.izq.toString(tabs + 4) + '\n'
-        string += ' '*(tabs + 2) + 'variable' + '\n'
-        string += self.der.toString(tabs + 4) + '\n'
+        string = ' '*tabs + operadores[self.op] + '\n'
+        string += self.izq.toString(tabs + 2) + '\n'
+        string += self.der.toString(tabs + 2) + '\n'
         return string
 
 class Tipos:
@@ -340,10 +335,10 @@ class Repeat:
 
     def toString(self,tabs):
         string = ' '*tabs + 'REPEAT\n'
-        string += ' '*(tabs + 2) + self.inst1.toString(tabs + 2) + '\n'
+        string += self.inst1.toString(tabs + 2) + '\n'
         string += ' '*tabs + 'WHILE\n'
         string += ' '*(tabs + 2) + 'condition\n'
-        string += ' '*(tabs + 4) + self.exp.toString(tabs + 4) + '\n'
+        string += self.exp.toString(tabs + 4) + '\n'
         return string
         
 
@@ -360,7 +355,7 @@ class Uniop:
             '$?'    : 'SIZE'
         }
         string = ' '*tabs + operadores[self.op] + '\n'
-        string += ' '*(tabs + 2) + self.val.toString(tabs + 2) + '\n'
+        string += self.val.toString(tabs + 2) + '\n'
         return string
 
 
@@ -373,6 +368,16 @@ class CadenaString:
         string = ' '*tabs + 'string\n'
         string += ' '*(tabs + 2) + '"' + self.string + '"' + '\n'
         return string
+
+class Variable:
+    def __init__(self,var):
+        self.var = var
+
+    def toString(self,tabs):
+        string = ' '*tabs + 'variable\n'
+        string += ' '*(tabs + 2) + self.var + '\n'
+        return string
+        
 
 
 precedence = (
@@ -459,9 +464,9 @@ def p_comaList(p):
     '''COMA_LIST    : ID Comma COMA_LIST
                     | ID '''
     if (len(p)==2):
-        p[0] = p[1]
+        p[0] = Variable(p[1])
     else:
-        p[0] = [p[1],p[3]]
+        p[0] = [Variable(p[1]),p[3]]
 
 def p_exp(p):
     '''EXP  : Number
@@ -500,12 +505,11 @@ def p_exp(p):
 
     if (len(p)==2): #Aqui va number, id, true, false
         if type(p[1]) is int:
-            tipo = 'int'
+            p[0] = Tipos('int',p[1])
         elif type(p[1]) is str:
-            tipo = 'id'
+            p[0] = Variable(p[1])
         else:
-            tipo = 'bool'
-        p[0] = Tipos(tipo,p[1])
+            p[0] = Tipos('bool',p[1])
 
     elif (len(p)==3): #Operadores unarios
         p[0] = Uniop(p[1],p[2])
@@ -536,9 +540,12 @@ def p_inst(p):
         if (p[1] == '{'):
             p[0] = Bloque(None,p[2])
         else:
-            p[0] = Asignacion(p[1],p[3])            
+            p[0] = Asignacion(Variable(p[1]),p[3])            
     elif (len(p) == 3):
-        p[0] = EntradaSalida(p[1],p[2])
+        if (p[1].lower()=='scan'):
+            p[0] = EntradaSalida(p[1],Variable(p[2]))
+        else:    
+            p[0] = EntradaSalida(p[1],p[2])
     elif (len(p) == 5):
         if(p[1] == 'repeat'):
             p[0] = Repeat(p[1],p[2],p[4],None)
@@ -552,7 +559,7 @@ def p_inst(p):
         if (p[1] == 'repeat'):
             p[0] = Repeat(p[1],p[2],p[4],p[6])
         else:
-            p[0] = For(p[2],p[3],p[4],p[6])
+            p[0] = For(Variable(p[2]),p[3],p[4],p[6])
     else:
         p[0] = Condicional(p[3],p[5],p[7])
 
