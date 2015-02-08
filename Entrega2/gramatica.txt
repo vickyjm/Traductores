@@ -5,8 +5,6 @@
 # Enrique Iglesias 11-10477              #
 ##########################################
 
-S -> PROGRAM
-
 PROGRAM -> 'program' INST
 
 INST -> 'id' '=' EXP
