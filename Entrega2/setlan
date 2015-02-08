@@ -233,7 +233,7 @@ class Asignacion:
         string = ' '*tabs + 'ASSIGN\n'
         string += self.var.toString(tabs + 2) 
         string += ' '*(tabs + 2) + 'value\n'
-        string += self.valor.toString(tabs + 6) 
+        string += self.valor.toString(tabs + 4) 
         return string
 
 class For:
@@ -245,7 +245,6 @@ class For:
 
     def toString(self,tabs):
         string = ' '*tabs + 'FOR\n'
-        print(self.id1)
         string += self.id1.toString(tabs + 2) 
         string += ' '*(tabs + 2) + 'direction\n'
         string += ' '*(tabs + 4) + self.direc.lower() +'\n'
@@ -344,12 +343,13 @@ class Simple:
     def toString(self,tabs):
         if (self.tipo=='id'):
             string = ' '*tabs + 'variable' + '\n'
+        elif (self.tipo=='set'):
+            string = ' '*tabs + self.tipo + '\n'
+            string += self.valor.toString(tabs + 2)
         else:    
             string = ' '*tabs + self.tipo + '\n'
-        string += ' '*(tabs + 2) + str(self.valor) + '\n'
+            string += ' '*(tabs + 2) + str(self.valor) + '\n'
         return string
-
-
 
 class Repeat:
     def __init__(self,inst1,exp,inst2):
