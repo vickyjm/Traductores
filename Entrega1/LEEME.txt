@@ -2,19 +2,19 @@ María Victoria Jorge. Carnet 11-10495
 Enrique Iglesias. Carnet 11-10477
 Entrega 1. Grupo 6
 
-Para esta primera entrega se realizó la implementación de un analizador lexicográfico 
-para el lenguaje Setlan utilizando el lenguaje Python (Versión 2.7). Además utilizamos 
+Para esta primera entrega se realizó la implementación de un analizador lexicográfico
+para el lenguaje Setlan utilizando el lenguaje Python (Versión 2.7). Además utilizamos
 la herramienta PLY (Versión 3.4) para facilitar el desarrollo del lexer.
 
-Para la implementación creamos un diccionario que contiene todas las palabras reservadas 
-del lenguaje Setlan y una lista con todos los tokens que podrán reconocerse durante 
-la ejecución del programa. Además se incluyó una variable global donde se almacenarán 
+Para la implementación creamos un diccionario que contiene todas las palabras reservadas
+del lenguaje Setlan y una lista con todos los tokens que podrán reconocerse durante
+la ejecución del programa. Además se incluyó una variable global donde se almacenarán
 los errores conseguidos durante el análisis.
 
-Se incluyeron las expresiones regulares necesarias para reconocer todos los símbolos 
+Se incluyeron las expresiones regulares necesarias para reconocer todos los símbolos
 de Setlan, además de funciones para llevar la cantidad de líneas leídas, la columna
-donde se ubica un token respecto a la línea donde se encontró. Finalmente se agregaron 
-expresiones para ignorar espacios, tabulaciones y comentarios, ya que estos no deben 
+donde se ubica un token respecto a la línea donde se encontró. Finalmente se agregaron
+expresiones para ignorar espacios, tabulaciones y comentarios, ya que estos no deben
 ser tomados como tokens, y se agregó una función para almacenar los errores encontrados.
 
 En el programa principal se lee el archivo ingresado por consola, que servirá como
