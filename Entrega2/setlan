@@ -405,7 +405,7 @@ class ListaInstruccion:
     def toString(self,tabs):
         string = self.inst1.toString(tabs)
         if (self.inst2!=None):
-            string = self.inst2.toString(tabs)
+            string += self.inst2.toString(tabs)
         return string
 
 class ListaDeclaracion:
