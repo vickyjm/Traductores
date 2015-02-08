@@ -462,7 +462,7 @@ precedence = (
     ('left', 'And'),    
     ('left', 'Or'),    
     ('right', 'Not'),    
-    ('nonassoc', 'UMINUS', 'MinSet', 'MaxSet', 'Size'),
+    ('right', 'UMINUS', 'MinSet', 'MaxSet', 'Size'),
     ('left', 'TimesMap','DivideMap','ModuleMap'),
     ('left','PlusMap','MinusMap'),
     ('left','Intersection'),

@@ -24,30 +24,29 @@ INST -> 'id' '=' EXP
 
 DECLARAR -> 'using' DEC_LIST 'in'
 
-DEC_LIST ->	TIPOS 'id'; DEC_LIST
-		  |	TIPOS 'id';
+DEC_LIST ->	TIPOS ID_LIST ';' DEC_LIST
+		  |	TIPOS ID_LIST ';'
+
+ID_LIST -> ID_LIST ',' 'id'
+		 | 'id'
 
 TIPOS -> 'int'
 	   | 'set'
 	   | 'bool'
 
-INST_LIST -> INST';' LIST_INST
-		   | INST';'
+INST_LIST -> INST';' INST_LIST
 		   | Epsilon
 
-STRING_LIST -> 'string' STRING_LIST
-			| 'string'
-
-ENUM_LIST -> STRING
+ENUM_LIST -> 'String'
             | EXP
             | ENUM_LIST ',' EXP
-            | ENUM_LIST ',' STRING
+            | ENUM_LIST ',' 'String'
 
 DIRECCION -> 'min'
 		   | 'max'
 
-NUMBER_LIST -> 'number' ',' NUMBERLIST
-			| 'number'
+NUMBER_LIST -> NUMBER_LIST ',' EXP
+			 | EXP
 
 EXP ->	'number'
 	 | 'id'
