@@ -456,7 +456,9 @@ class ListaImpresion:
             string += self.listExp.toString(tabs)
         string += self.exp.toString(tabs)
         return string
-        
+
+
+# Reglas de precedencia para el parser        
 precedence = (
     ('right','ELSE'),
     ('left', 'And'),    
@@ -474,16 +476,21 @@ precedence = (
     ('nonassoc','At')
     )
 
+# Primera regla a evaluar. Los programas de Setlan siempre empiezan
+# con la palabra reservada 'program'
 def p_program(p):
     '''PROGRAM : Program INST'''
     p[0] = Program(p[2])
 
+# Regla para definir los tipos permitidos por Setlan
 def p_tipos(p):
     ''' TIPOS   : Int 
                 | Set 
                 | Boolean '''
     p[0] = p[1]
 
+# Regla para crear una lista de expresiones y/o strings
+# separados por comas. Esto se utilizará para los print y println
 def p_enumList(p): 
     '''ENUM_LIST    : String
                     | EXP
@@ -500,15 +507,23 @@ def p_enumList(p):
         else:
             p[0] = ListaImpresion(p[1],p[3])
 
-
+# Regla para la declaración de variables. Siempre empieza con la 
+# palabra reservada 'using', luego tiene una lista de declaraciones
+# y finaliza con la palabra reservada 'in'
 def p_declarar(p):
     '''DECLARAR : Using DEC_LIST In'''
     p[0] = Declarar(p[2])
 
+# Regla para la palabra vacía
 def p_epsilon(p):
     ''' EPSILON : '''
     pass
 
+# Regla usada para la declaración de variables. Tendrá siempre 
+# una palabra reservada que indica el tipo de la(s) variable(s)
+# declarada(s), seguido de una lista de identificadores, luego un
+# punto y coma. En caso de ser varias declaraciones termina con una
+# nueva lista.
 def p_decList(p):
     '''DEC_LIST   : TIPOS ID_LIST Semicolon DEC_LIST
                   | TIPOS ID_LIST Semicolon '''
@@ -517,6 +532,7 @@ def p_decList(p):
     else:
         p[0] = ListaDeclaracion(p[1],p[2],p[4])
 
+# Regla para las listas de instrucciones.
 def p_instList(p):
     '''INST_LIST    : INST Semicolon INST_LIST
                     | EPSILON '''
@@ -525,7 +541,8 @@ def p_instList(p):
     elif (len(p)==2):
         pass
 
-
+# Regla que permite listar identificadores de variables separados por
+# comas. Esto se usa para poder realizar la declaración de variables.
 def p_idList(p):
     '''ID_LIST    : ID_LIST Comma ID 
                     | ID '''
@@ -534,6 +551,8 @@ def p_idList(p):
     else:
         p[0] = ListaID(p[1],Simple('id',p[3]))
 
+# Regla para las expresiones. Aquí se incluyen los números, identificadores,
+# constantes booleanas, conjuntos y todos los operadores de Setlan.
 def p_exp(p):
     '''EXP  : Number
             | ID
@@ -589,7 +608,7 @@ def p_exp(p):
         else:
             p[0] = Opbin(p[1],p[2],p[3])
 
-
+# Regla para definir las instrucciones permitidas por Setlan.
 def p_inst(p):
     '''INST : ID Assign EXP
             | OpenCurly DECLARAR INST_LIST CloseCurly
@@ -634,11 +653,14 @@ def p_inst(p):
     else:
         p[0] = Condicional(p[3],p[5],p[7])
 
+# Regla para las direcciones de los ciclos for. 
 def p_direccion(p):
     ''' DIRECCION : MIN
                   | MAX '''
     p[0] = p[1]
 
+# Regla para poder generar una lista de números o identificadores de variables
+# enteras separadas por comas para la creación de conjuntos.
 def p_numberList(p):
     '''NUMBER_LIST  : NUMBER_LIST Comma EXP 
                     | EXP'''
@@ -647,6 +669,7 @@ def p_numberList(p):
     else:
         p[0] = ListaNumero(p[1],p[3])
 
+# Regla para poder encontrar los errores sintácticos.
 def p_error(p):
     global parser_error
     if (p is not None):
