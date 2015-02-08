@@ -274,12 +274,12 @@ class EntradaSalida:
 
     def toString(self,tabs):
         string = ' '*tabs + self.flag.upper() + '\n'
-        if (self.flag=='scan'):
+        if (self.flag =='scan'):
             string += self.exp.toString(tabs + 2)
         else:
             string += ' '*(tabs + 2) + 'elements\n'
             string += self.exp.toString(tabs + 4) 
-            if (self.flag=='println'):
+            if (self.flag =='println'):
                 string += ' '*(tabs + 4) + 'string\n'
                 string += ' '*(tabs + 6) + "'\\n'" + '\n'
         return string
