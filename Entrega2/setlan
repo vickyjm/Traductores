@@ -343,6 +343,7 @@ class Simple:
     def toString(self,tabs):
         if (self.tipo=='id'):
             string = ' '*tabs + 'variable' + '\n'
+            string += ' '*(tabs + 2) + str(self.valor) + '\n'
         elif (self.tipo=='set'):
             string = ' '*tabs + self.tipo + '\n'
             string += self.valor.toString(tabs + 2)
