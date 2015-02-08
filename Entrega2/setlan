@@ -316,7 +316,7 @@ class Opbin:
             'or'    : 'Or',
             'and'   : 'And'
         }
-        string = ' '*tabs + operadores[self.op] + '\n'
+        string = ' '*tabs + operadores[self.op] +' ' + self.op + '\n'
         if (isinstance(self.izq,Simple)):
             if (self.izq.tipo=='id'):
                 string += ' '*(tabs + 2) + 'variable\n'
@@ -644,10 +644,10 @@ def p_numberList(p):
     if (len(p)==2):
         p[0] = Simple('int',p[1])
     else:
-        p[0] = ListaNumero(p[1],p[3])
+        p[0] = ListaNumero(p[1],Simple('int',p[3]))
 
 def p_error(p):
-    if p:
+    if (p is not None):
         msg = "Error de sintaxis. Se encontró token " + str(p.value) + " en la linea "
         msg += str(p.lineno) + ", columna " + str(find_column(p.lexer.lexdata,p))
     else:
