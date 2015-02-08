@@ -245,11 +245,12 @@ class For:
 
     def toString(self,tabs):
         string = ' '*tabs + 'FOR\n'
+        print(self.id1)
         string += self.id1.toString(tabs + 2) 
         string += ' '*(tabs + 2) + 'direction\n'
         string += ' '*(tabs + 4) + self.direc.lower() +'\n'
         string += ' '*(tabs + 2) + 'IN\n'
-        string += self.id2.toString(tabs + 4) 
+        string += self.exp.toString(tabs + 4) 
         string += ' '*(tabs + 2) + 'DO\n'
         string += self.inst.toString(tabs + 4)
         return string
@@ -311,7 +312,9 @@ class Opbin:
             '>='    : 'GREATER_EQUAL',
             '=='    : 'EQUALS',
             '/='    : 'NOT_EQUAL',
-            '@'     : 'AT'
+            '@'     : 'AT',
+            'or'    : 'Or',
+            'and'   : 'And'
         }
         string = ' '*tabs + operadores[self.op] + '\n'
         if (isinstance(self.izq,Simple)):
@@ -376,7 +379,8 @@ class Uniop:
             '-'     : 'UMINUS',
             '<?'    : 'MIN_SET',
             '>?'    : 'MAX_SET',
-            '$?'    : 'SIZE'
+            '$?'    : 'SIZE',
+            'not'   : 'Not'
         }
         string = ' '*tabs + operadores[self.op] + '\n'
         string += self.val.toString(tabs + 2) 
@@ -623,7 +627,7 @@ def p_inst(p):
 
     elif (len(p)==7):
         if (p[1]=='for'):
-            p[0] = For(p[2],p[3],p[4],p[6])
+            p[0] = For(Simple('int',p[2]),p[3],p[4],p[6])
         else:
             p[0] = Repeat(p[2],p[4],p[6])
     else:
