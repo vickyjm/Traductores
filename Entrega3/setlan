@@ -138,6 +138,8 @@ t_NotEqual = r'/='
 def t_Number(t):
     r'\d+'
     t.value = int(t.value)    
+    if ((t.value > 2147483647) or (t.value < -2147483648)):
+        error.append(t)
     return t
 
 t_Comma = r','
