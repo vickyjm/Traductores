@@ -22,7 +22,10 @@ class Tabla:
 
 	def contains(self,clave):
 		if not(self.isInTable(clave)):
-			return self.padre.contains(clave)
+			if (self.padre != None):
+				return self.padre.contains(clave)
+			else:
+				return None
 		return self.isInTable(clave)
 
 	def isInTable(self,clave):

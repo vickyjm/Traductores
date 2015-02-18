@@ -31,9 +31,11 @@ class Bloque:
         return string
 
     def check(self,tabla2):
+        global Tabla
         if (Tabla != None):
             self.tabla.conectFather(tabla2)
-        return self.exp.check(self.tabla)
+        self.exp.check(self.tabla)
+        Tabla = 
 
 
 class Declarar:
@@ -70,6 +72,7 @@ class Condicional:
         return string
 
     def check(self,tabla2):
+        global errorDeclaracion
         if (self.cond.tipoExpresion() != 'bool'):
             msg = "Error en linea "+str(self.linea) + ", columna " + str(self.colum)
             msg += ": Instruccion 'if' espera expresiones de tipo bool y no "+ self.cond.tipoExpresion() + "\n"
@@ -94,6 +97,7 @@ class Asignacion:
         return string
 
     def check(self,tabla2):
+        global errorDeclaracion
         if not(tabla2.contains(self.var)):
             msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
             msg += ": La variable "+self.var+" no ha sido declarada\n"
@@ -122,6 +126,7 @@ class For:
         return string
 
     def check(self,tabla2):
+        global errorDeclaracion
         self.tabla.conectFather(tabla2)
         self.tabla.insert(self.id1,0,'int')
         if (self.exp.tipoExpresion() != 'set'):
@@ -147,9 +152,10 @@ class While:
         return string
 
     def check(self,tabla2):
+        global errorDeclaracion
         if (self.exp.tipoExpresion() != 'bool'):
             msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
-            msg += ": La instruccion 'while' solo acepta expresiones de tipo 'bool' no"+self.exp.tipoExpresion()+"\n"
+            msg += ": La instruccion 'while' solo acepta expresiones de tipo 'bool' no "+self.exp.tipoExpresion()+"\n"
             errorDeclaracion.append(msg)
         else:
             return self.inst.check(tabla2)
@@ -158,9 +164,6 @@ class EntradaSalida:
     def __init__(self,flag,exp):
         self.flag = flag
         self.exp = exp
-
-    def check(self,tabla2):
-        return self.exp.check(tabla2)
 
     def toString(self,tabs):
         string = ' '*tabs + self.flag.upper() + '\n'
@@ -173,6 +176,16 @@ class EntradaSalida:
                 string += ' '*(tabs + 4) + 'string\n'
                 string += ' '*(tabs + 6) + '"\\n"' + '\n'
         return string
+
+    def check(self,tabla2):
+        global errorDeclaracion
+        if (self.flag == 'scan'):
+            valores = tabla2.lookup(self.exp)
+            if ((valores[1] != 'bool') and (valores[1] != 'int')):
+                msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                msg += ": La instrucción 'scan' solo acepta variables de tipo 'int' y 'bool' no "+self.exp.tipo+"\n"
+                errorDeclaracion.append(msg)
+        self.exp.check(tabla2)
 
 class Opbin:
     def __init__(self,izq,op,der,linea,columna):
@@ -208,48 +221,6 @@ class Opbin:
             'and'   : 'bool'
         }
         return operadores.get(self.op)
-
-    def check(self,tabla2):
-        tipoOperador = self.tipoExpresion()
-
-        
-        if (isinstance(self.izq,Simple)):
-            if (self.izq.tipo != tipoOperador):
-                    msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
-                    msg += ": Solo acepta expresiones de tipo '"+tipoOperador+"' no"+self.izq.tipoExpresion()+"\n"
-                    errorDeclaracion.append(msg)
-            if (isinstance(self.der,Simple)):
-                if (self.der.tipo != tipoOperador):
-                    msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
-                    msg += ": Solo acepta expresiones de tipo '"+tipoOperador+"' no"+self.der.tipoExpresion()+"\n"
-                    errorDeclaracion.append(msg) 
-            else:
-                if (self.der.tipoExpresion() == tipoOperador):
-                    self.der.check(tabla2)
-                else:
-                    msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
-                    msg += ": Solo acepta expresiones de tipo '"+tipoOperador+"' no"+self.der.tipoExpresion()+"\n"
-                    errorDeclaracion.append(msg)
-        else:
-            if (self.izq.tipoExpresion() == tipoOperador):
-                self.izq.check(tabla2)
-            else:
-                msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
-                msg += ": Solo acepta expresiones de tipo '"+tipoOperador+"' no"+self.izq.tipoExpresion()+"\n"
-                errorDeclaracion.append(msg)
-            if (isinstance(self.der,Simple)):
-                if (self.der.tipo != tipoOperador):
-                    msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
-                    msg += ": Solo acepta expresiones de tipo '"+tipoOperador+"' no"+self.der.tipoExpresion()+"\n"
-                    errorDeclaracion.append(msg) 
-            else:
-                if (self.der.tipoExpresion() == tipoOperador):
-                    self.der.check(tabla2)
-                else:
-                    msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
-                    msg += ": Solo acepta expresiones de tipo '"+tipoOperador+"' no"+self.der.tipoExpresion()+"\n"
-                    errorDeclaracion.append(msg)
-
 
     def toString(self,tabs):
         operadores = {
@@ -296,10 +267,55 @@ class Opbin:
             string += self.der.toString(tabs + 2) 
         return string
 
+    def check(self,tabla2):
+        global errorDeclaracion
+        tipoOperador = self.tipoExpresion()
+
+        
+        if (isinstance(self.izq,Simple)):
+            if (self.izq.tipo != tipoOperador):
+                    msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                    msg += ": Solo acepta expresiones de tipo '"+tipoOperador+"' no"+self.izq.tipoExpresion()+"\n"
+                    errorDeclaracion.append(msg)
+            if (isinstance(self.der,Simple)):
+                if (self.der.tipo != tipoOperador):
+                    msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                    msg += ": Solo acepta expresiones de tipo '"+tipoOperador+"' no"+self.der.tipoExpresion()+"\n"
+                    errorDeclaracion.append(msg) 
+            else:
+                if (self.der.tipoExpresion() == tipoOperador):
+                    self.der.check(tabla2)
+                else:
+                    msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                    msg += ": Solo acepta expresiones de tipo '"+tipoOperador+"' no"+self.der.tipoExpresion()+"\n"
+                    errorDeclaracion.append(msg)
+        else:
+            if (self.izq.tipoExpresion() == tipoOperador):
+                self.izq.check(tabla2)
+            else:
+                msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                msg += ": Solo acepta expresiones de tipo '"+tipoOperador+"' no"+self.izq.tipoExpresion()+"\n"
+                errorDeclaracion.append(msg)
+            if (isinstance(self.der,Simple)):
+                if (self.der.tipo != tipoOperador):
+                    msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                    msg += ": Solo acepta expresiones de tipo '"+tipoOperador+"' no"+self.der.tipoExpresion()+"\n"
+                    errorDeclaracion.append(msg) 
+            else:
+                if (self.der.tipoExpresion() == tipoOperador):
+                    self.der.check(tabla2)
+                else:
+                    msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                    msg += ": Solo acepta expresiones de tipo '"+tipoOperador+"' no"+self.der.tipoExpresion()+"\n"
+                    errorDeclaracion.append(msg)
+
+
 class Simple:
-    def __init__(self,tipo,valor):
+    def __init__(self,tipo,valor,linea,columna):
         self.tipo = tipo
         self.valor = valor
+        self.linea = linea
+        self.colum = columna
 
     def toString(self,tabs):
         if (self.tipo=='id'):
@@ -312,6 +328,14 @@ class Simple:
             string = ' '*tabs + self.tipo + '\n'
             string += ' '*(tabs + 2) + str(self.valor) + '\n'
         return string
+
+    def check(self,tabla2):
+        global errorDeclaracion
+        if (self.tipo == 'id') and (tabla2.contains(self.valor) == None):
+            msg = "Error en la linea "+str(self.linea)+", columna "+str(self.column)
+            msg += ": La variable "+self.valor+" no ha sido declarada\n"
+            errorDeclaracion.append(msg)
+
 
 class Repeat:
     def __init__(self,inst1,exp,inst2,linea,columna):
@@ -333,6 +357,7 @@ class Repeat:
         return string
 
     def check(self,tabla2):
+        global errorDeclaracion
         self.inst1.check(tabla2)
         if (isinstance(self.exp,Simple) and (self.exp.tipo != 'bool')):
             msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
@@ -366,7 +391,20 @@ class Uniop:
         }
         return operadores.get(self.op)
 
+    def toString(self,tabs):
+        operadores = {
+            '-'     : 'UMINUS',
+            '<?'    : 'MIN_SET',
+            '>?'    : 'MAX_SET',
+            '$?'    : 'SIZE',
+            'not'   : 'Not'
+        }
+        string = ' '*tabs + operadores[self.op] + '\n'
+        string += self.val.toString(tabs + 2) 
+        return string
+
     def check(self,tabla2):
+        global errorDeclaracion
         tipoOperador = self.tipoExpresion()
         if (isinstance(self.val,Simple)):
             if (self.val.tipo != tipoOperador):
@@ -381,44 +419,34 @@ class Uniop:
             else: 
                 self.val.check(tabla2)
 
-    def toString(self,tabs):
-        operadores = {
-            '-'     : 'UMINUS',
-            '<?'    : 'MIN_SET',
-            '>?'    : 'MAX_SET',
-            '$?'    : 'SIZE',
-            'not'   : 'Not'
-        }
-        string = ' '*tabs + operadores[self.op] + '\n'
-        string += self.val.toString(tabs + 2) 
-        return string
 
 
 class CadenaString:
     def __init__(self,string):
         self.string = string
 
-    def check(self,tabla2):
-        return True
-
     def toString(self,tabs):
         string = ' '*tabs + 'string\n'
         string += ' '*(tabs + 2) + '"' + self.string + '"' + '\n'
         return string
+
+    def check(self,tabla2):
+        return True
 
 class ListaInstruccion:
     def __init__(self,inst1,inst2):
         self.inst1 = inst1
         self.inst2 = inst2
 
-    #def check(self,tabla2):
-
-
     def toString(self,tabs):
         string = self.inst1.toString(tabs)
         if (self.inst2!=None):
             string += self.inst2.toString(tabs)
         return string
+
+    def check(self,tabla2):
+        self.inst1.check(tabla2)
+        self.inst2.check(tabla2)
 
 class ListaDeclaracion:
     def __init__(self, tipo, idList, decList,tabla):
@@ -433,6 +461,9 @@ class ListaDeclaracion:
         if (self.decList!=None):
             string += self.decList.toString(tabs)
         return string
+
+    def check(self,tabla2):
+
 
 class ListaID:
     def __init__(self,idList,id1):
@@ -458,6 +489,9 @@ class ListaNumero:
         string += self.num.toString(tabs)
         return string
 
+    def check(self,tabla2):
+
+
 class ListaImpresion:
     def __init__(self,listExp,exp):
         self.listExp = listExp
@@ -469,6 +503,10 @@ class ListaImpresion:
             string += self.listExp.toString(tabs)
         string += self.exp.toString(tabs)
         return string
+
+    def check(self,tabla2):
+        self.exp.check(tabla2)
+        self.listExp.check(tabla2)
         
 precedence = (
     ('right','ELSE'),
@@ -526,6 +564,7 @@ def p_decList(p):
     '''DEC_LIST   : TIPOS ID_LIST Semicolon DEC_LIST
                   | TIPOS ID_LIST Semicolon '''
     global Tabla
+    global errorDeclaracion
     Tabla = Tabla()
     if (len(p)==4):
         p[0] = ListaDeclaracion(p[1],p[2],None,Tabla)
