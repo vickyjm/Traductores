@@ -510,19 +510,22 @@ class ListaImpresion:
         
 precedence = (
     ('right','ELSE'),
-    ('left', 'And'),    
-    ('left', 'Or'),    
-    ('right', 'Not'),    
-    ('right', 'UMINUS', 'MinSet', 'MaxSet', 'Size'),
+    ('left', 'Or'),
+    ('left', 'And'),        
+    ('right', 'Not'),
+    ('nonassoc','Greater','GreaterEqual', 'Less','LessEqual'),    
+    ('right', 'MinSet', 'MaxSet', 'Size'),
     ('left', 'TimesMap','DivideMap','ModuleMap'),
     ('left','PlusMap','MinusMap'),
     ('left','Intersection'),
     ('left','Union','Diference'),
-    ('left','Times','Divide','Module'),
     ('left', 'Plus', 'Minus'),
-    ('nonassoc','Greater','GreaterEqual', 'Less','LessEqual'),
+    ('left','Times','Divide','Module'),
     ('left','Equals','NotEqual'),
     ('nonassoc','At')
+    ('left','Lparen'),
+    ('right','Rparen'),
+    ('right', 'UMINUS')
     )
 
 def p_program(p):
@@ -573,7 +576,7 @@ def p_decList(p):
 
     for identif in p[2]:
             if (p[0].tabla.isInTable(identif)):
-                msg = "Error en linea "+str(p.lineno) + ", columna " + str(find_column(p.lexer.lexdata,p))
+                msg = "Error en linea "+str(p.lineno) + ", columna " + str(find_column(lexer.lexdata,p))
                 msg += ": La variable "+identif+" ya se encuentra declarada en este alcance\n"
                 errorDeclaracion.append(msg)
             else:
@@ -706,7 +709,8 @@ def p_direccion(p):
 
 def p_numberList(p):
     '''NUMBER_LIST  : NUMBER_LIST Comma EXP 
-                    | EXP'''
+                    | EXP
+                    | EPSILON'''
     if (len(p)==2):
         p[0] = p[1]
     else:
@@ -716,7 +720,7 @@ def p_error(p):
     global parser_error
     if (p is not None):
         msg = "Error de sintaxis. Se encontró token " + str(p.value) + " en la linea "
-        msg += str(p.lineno) + ", columna " + str(find_column(p.lexer.lexdata,p))
+        msg += str(p.lineno) + ", columna " + str(find_column(lexer.lexdata,p))
     else:
         msg = "Error de sintaxis al final del archivo"
     print msg
