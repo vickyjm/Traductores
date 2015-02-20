@@ -1,4 +1,12 @@
 # -*- coding: UTF-8 -*-
+
+##########################################
+# CI3715 Traductores e Interpretadores   #
+# Entrega 3. Grupo 6                     #
+# Maria Victoria Jorge 11-10495          #
+# Enrique Iglesias 11-10477              # 
+##########################################
+
 from SymTable import *
 global errorDeclaracion
 global Tabla
@@ -16,10 +24,9 @@ class Program:
         return self.inst.check(tabla2)
 
 class Bloque:
-    def __init__(self,dec,exp,tabla):
+    def __init__(self,dec,exp):
         self.exp = exp
         self.dec = dec
-        self.tabla = tabla
 
     def toString(self,tabs):
         string = ' '*tabs + 'BLOCK_BEGIN\n'
@@ -32,11 +39,19 @@ class Bloque:
 
     def check(self,tabla2):
         global Tabla
-        if (Tabla != None):
-            self.tabla.conectFather(tabla2)
-        self.exp.check(self.tabla)
-        Tabla = 
+        if isinstance(self.dec,Declarar): #Existen declaraciones. Se crea una nueva tabla
+            Tabla = Tabla(Tabla) # Agregamos un nuevo nivel a la tabla
+        self.dec.check(Tabla)
+        self.exp.check(Tabla)
 
+    def printSymTable(self,tabs):
+        if (isinstance(self.dec, Declarar)):
+            string = ' '*tabs + 'SCOPE\n'
+            string += self.dec.printSymTable(tabs + 2)
+            string += self.exp.printSymTable(tabs + 2)
+            string += ' '*tabs + 'END_SCOPE\n'
+            return string
+        return ''
 
 class Declarar:
     def __init__(self,lista):
@@ -420,7 +435,6 @@ class Uniop:
                 self.val.check(tabla2)
 
 
-
 class CadenaString:
     def __init__(self,string):
         self.string = string
@@ -449,11 +463,10 @@ class ListaInstruccion:
         self.inst2.check(tabla2)
 
 class ListaDeclaracion:
-    def __init__(self, tipo, idList, decList,tabla):
+    def __init__(self, tipo, idList, decList):
         self.tipo = tipo
         self.idList = idList
         self.decList = decList
-        self.tabla = tabla
 
     def toString(self,tabs):
         string = ' '*tabs + self.tipo + '\n'
@@ -463,7 +476,33 @@ class ListaDeclaracion:
         return string
 
     def check(self,tabla2):
+        global Tabla
+        global errorDeclaracion
+        valDefecto = {
+            'int'   :   0,
+            'bool'  :   False,
+            'set'   :   set()
+        }
+        for ids in self.idList:
+            if (Tabla.isInTable(ids)):
+                msg = "Error en linea "+ ids.getLinea() + ", columna " + ids.getColumna()
+                msg += ": La variable "+ ids +" ya se encuentra declarada en este alcance\n"
+                errorDeclaracion.append(msg)
+            else:
+                Tabla.insert(ids,valDefecto.get(self.tipo),self.tipo)
+        self.decList.check(Tabla)
 
+    def printSymTable(self,tabs):
+        valDefecto = {
+            'int'   :   0,
+            'bool'  :   False,
+            'set'   :   set()
+        }
+        for ids in self.idList:
+            string += ' '*tabs + 'Variable: ' + ids + ' | Type: ' + self.tipo
+            string += ' | Value: ' + str(valDefecto.get(self.tipo)) + '\n'
+        string += self.decList.printSymTable(tabs)
+        return string
 
 class ListaID:
     def __init__(self,idList,id1):
@@ -489,7 +528,7 @@ class ListaNumero:
         string += self.num.toString(tabs)
         return string
 
-    def check(self,tabla2):
+    #def check(self,tabla2):
 
 
 class ListaImpresion:
@@ -563,21 +602,11 @@ def p_epsilon(p):
 def p_decList(p):
     '''DEC_LIST   : TIPOS ID_LIST Semicolon DEC_LIST
                   | TIPOS ID_LIST Semicolon '''
-    global Tabla
-    global errorDeclaracion
-    Tabla = Tabla()
-    if (len(p)==4):
-        p[0] = ListaDeclaracion(p[1],p[2],None,Tabla)
-    else:
-        p[0] = ListaDeclaracion(p[1],p[2],p[4],Tabla)
 
-    for identif in p[2]:
-            if (p[0].tabla.isInTable(identif)):
-                msg = "Error en linea "+str(p.lineno) + ", columna " + str(find_column(p.lexer.lexdata,p))
-                msg += ": La variable "+identif+" ya se encuentra declarada en este alcance\n"
-                errorDeclaracion.append(msg)
-            else:
-                p[0].tabla.insert(identif,p[1])
+    if (len(p)==4):
+        p[0] = ListaDeclaracion(p[1],p[2],None)
+    else:
+        p[0] = ListaDeclaracion(p[1],p[2],p[4])
 
 
 
