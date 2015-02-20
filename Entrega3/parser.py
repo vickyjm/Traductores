@@ -35,7 +35,6 @@ class Bloque:
         if (Tabla != None):
             self.tabla.conectFather(tabla2)
         self.exp.check(self.tabla)
-        Tabla = 
 
 
 class Declarar:
@@ -462,7 +461,7 @@ class ListaDeclaracion:
             string += self.decList.toString(tabs)
         return string
 
-    def check(self,tabla2):
+    #def check(self,tabla2):
 
 
 class ListaID:
@@ -489,7 +488,7 @@ class ListaNumero:
         string += self.num.toString(tabs)
         return string
 
-    def check(self,tabla2):
+    #def check(self,tabla2):
 
 
 class ListaImpresion:
@@ -522,9 +521,7 @@ precedence = (
     ('left', 'Plus', 'Minus'),
     ('left','Times','Divide','Module'),
     ('left','Equals','NotEqual'),
-    ('nonassoc','At')
-    ('left','Lparen'),
-    ('right','Rparen'),
+    ('nonassoc','At'),
     ('right', 'UMINUS')
     )
 
@@ -659,13 +656,14 @@ def p_exp(p):
 
 def p_inst(p):
     '''INST : ID Assign EXP
+            | OpenCurly CloseCurly
             | OpenCurly DECLARAR INST_LIST CloseCurly
             | OpenCurly INST_LIST CloseCurly
             | Scan ID
             | Print ENUM_LIST
             | Println ENUM_LIST
-            | IF Lparen EXP Rparen INST ELSE INST
             | IF Lparen EXP Rparen INST
+            | IF Lparen EXP Rparen INST ELSE INST
             | FOR ID DIRECCION EXP DO INST
             | REPEAT INST WHILE EXP
             | REPEAT INST WHILE EXP DO INST
@@ -674,6 +672,8 @@ def p_inst(p):
     if (len(p)==3):
         if (p[1]=='scan'):
             p[0] = EntradaSalida(p[1],Simple('id',p[2]))
+        elif (p[1] == '{'):
+            pass
         else:
             p[0] = EntradaSalida(p[1],p[2])
 
@@ -709,12 +709,18 @@ def p_direccion(p):
 
 def p_numberList(p):
     '''NUMBER_LIST  : NUMBER_LIST Comma EXP 
-                    | EXP
-                    | EPSILON'''
+                    | EXP '''
     if (len(p)==2):
         p[0] = p[1]
     else:
         p[0] = ListaNumero(p[1],p[3])
+
+def nrolineas(fname):
+    nro_linea = 0
+    archivo = open(fname, "r")
+    for linea in archivo:
+        nro_linea += 1
+    return nro_linea 
 
 def p_error(p):
     global parser_error

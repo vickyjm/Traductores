@@ -191,7 +191,7 @@ if __name__ == '__main__':
     tokList = []
     lexer = lex.lex()
 
-    if (len(sys.argv) != 2):
+    if (len(sys.argv) < 3):
         print "Error con los argumentos de entrada"
         sys.exit(1)
 
@@ -213,5 +213,44 @@ if __name__ == '__main__':
         parser = yacc.yacc()
         out = parser.parse(data)
         if not(parser_error):
-            print out.toString(0)
+            arbol = out.toString(0)
+
+    if (len(sys.argv) == 3):
+        if (sys.argv[2] == '-t'):
+            for aux in tokList:
+                if (aux.type == 'ID') or (aux.type == 'String') or (aux.type == 'Number'):
+                    print 'Token' + str(aux.type) +': "' +str(aux.value)+'"(Linea ',
+                    print  str(aux.lineno) +', Columna '+ str(find_column(lexer.lexdata,aux))+')'
+                else:
+                    print 'Token'+str(aux.type)+'(Linea ' + str(aux.lineno) +', Columna ',
+                    print str(find_column(lexer.lexdata,aux))+')'
+        elif (sys.argv[2] == '-a'):
+            print arbol
+        else:
+            pass
+    elif (len(sys.argv) == 4):
+        if (sys.argv[2] == '-t'):
+            for aux in tokList:
+                if (aux.type == 'ID') or (aux.type == 'String') or (aux.type == 'Number'):
+                    print 'Token' + str(aux.type) +': "' +str(aux.value)+'"(Linea ',
+                    print  str(aux.lineno) +', Columna '+ str(find_column(lexer.lexdata,aux))+')'
+                else:
+                    print 'Token'+str(aux.type)+'(Linea ' + str(aux.lineno) +', Columna ',
+                    print str(find_column(lexer.lexdata,aux))+')'
+            if (sys.argv[3] == '-a'):
+                print arbol
+            else:
+                pass
+        else:
+            print arbol
+    else:
+        for aux in tokList:
+            if (aux.type == 'ID') or (aux.type == 'String') or (aux.type == 'Number'):
+                print 'Token' + str(aux.type) +': "' +str(aux.value)+'"(Linea ',
+                print  str(aux.lineno) +', Columna '+ str(find_column(lexer.lexdata,aux))+')'
+            else:
+                print 'Token'+str(aux.type)+'(Linea ' + str(aux.lineno) +', Columna ',
+                print str(find_column(lexer.lexdata,aux))+')'
+
+        print arbol
     myfile.close()
