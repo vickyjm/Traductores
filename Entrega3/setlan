@@ -3,7 +3,7 @@
 
 ##########################################
 # CI3715 Traductores e Interpretadores   #
-# Entrega 2. Grupo 6                     #
+# Entrega 3. Grupo 6                     #
 # Maria Victoria Jorge 11-10495          #
 # Enrique Iglesias 11-10477              # 
 ##########################################
@@ -214,48 +214,58 @@ if __name__ == '__main__':
         out = parser.parse(data)
         if not(parser_error):
             arbol = out.toString(0)
-
-    if (len(sys.argv) == 3):
-        if (sys.argv[2] == '-t'):
-            for aux in tokList:
-                if (aux.type == 'ID') or (aux.type == 'String') or (aux.type == 'Number'):
-                    print 'Token' + str(aux.type) +': "' +str(aux.value)+'"(Linea ',
-                    print  str(aux.lineno) +', Columna '+ str(find_column(lexer.lexdata,aux))+')'
-                else:
-                    print 'Token'+str(aux.type)+'(Linea ' + str(aux.lineno) +', Columna ',
-                    print str(find_column(lexer.lexdata,aux))+')'
-        elif (sys.argv[2] == '-a'):
-            print arbol
-        else:
-            pass
-    elif (len(sys.argv) == 4):
-        if ((sys.argv[2] in ['-t','-a']) and (sys.argv[3] in ['-t','-a'])):
-            for aux in tokList:
-                if (aux.type == 'ID') or (aux.type == 'String') or (aux.type == 'Number'):
-                    print 'Token' + str(aux.type) +': "' +str(aux.value)+'"(Linea ',
-                    print  str(aux.lineno) +', Columna '+ str(find_column(lexer.lexdata,aux))+')'
-                else:
-                    print 'Token'+str(aux.type)+'(Linea ' + str(aux.lineno) +', Columna ',
-                    print str(find_column(lexer.lexdata,aux))+')'
-            print arbol
-        elif ((sys.argv[2] in ['-t','-s']) and (sys.argv[3] in ['-t','-s'])):
-            for aux in tokList:
-                if (aux.type == 'ID') or (aux.type == 'String') or (aux.type == 'Number'):
-                    print 'Token' + str(aux.type) +': "' +str(aux.value)+'"(Linea ',
-                    print  str(aux.lineno) +', Columna '+ str(find_column(lexer.lexdata,aux))+')'
-                else:
-                    print 'Token'+str(aux.type)+'(Linea ' + str(aux.lineno) +', Columna ',
-                    print str(find_column(lexer.lexdata,aux))+')'
-        else:
-            print arbol
-    else:
-        for aux in tokList:
-            if (aux.type == 'ID') or (aux.type == 'String') or (aux.type == 'Number'):
-                print 'Token' + str(aux.type) +': "' +str(aux.value)+'"(Linea ',
-                print  str(aux.lineno) +', Columna '+ str(find_column(lexer.lexdata,aux))+')'
+            out.check()
+            if (len(errorDeclaracion)!=0):
+                print errorDeclaracion
             else:
-                print 'Token'+str(aux.type)+'(Linea ' + str(aux.lineno) +', Columna ',
-                print str(find_column(lexer.lexdata,aux))+')'
+                if (len(sys.argv) == 3):
+                    if (sys.argv[2] == '-t'):
+                        for aux in tokList:
+                            if (aux.type == 'ID') or (aux.type == 'String') or (aux.type == 'Number'):
+                                print 'Token' + str(aux.type) +': "' +str(aux.value)+'"(Linea ',
+                                print  str(aux.lineno) +', Columna '+ str(find_column(lexer.lexdata,aux))+')'
+                            else:
+                                print 'Token'+str(aux.type)+'(Linea ' + str(aux.lineno) +', Columna ',
+                                print str(find_column(lexer.lexdata,aux))+')'
+                    elif (sys.argv[2] == '-a'):
+                        print arbol
+                    else:
+                        print "Symbol Table\n"
+                        print out.printSymTable(0)
+                elif (len(sys.argv) == 4):
+                    if ((sys.argv[2] in ['-t','-a']) and (sys.argv[3] in ['-t','-a'])):
+                        for aux in tokList:
+                            if (aux.type == 'ID') or (aux.type == 'String') or (aux.type == 'Number'):
+                                print 'Token' + str(aux.type) +': "' +str(aux.value)+'"(Linea ',
+                                print  str(aux.lineno) +', Columna '+ str(find_column(lexer.lexdata,aux))+')'
+                            else:
+                                print 'Token'+str(aux.type)+'(Linea ' + str(aux.lineno) +', Columna ',
+                                print str(find_column(lexer.lexdata,aux))+')'
+                        print arbol
+                    elif ((sys.argv[2] in ['-t','-s']) and (sys.argv[3] in ['-t','-s'])):
+                        for aux in tokList:
+                            if (aux.type == 'ID') or (aux.type == 'String') or (aux.type == 'Number'):
+                                print 'Token' + str(aux.type) +': "' +str(aux.value)+'"(Linea ',
+                                print  str(aux.lineno) +', Columna '+ str(find_column(lexer.lexdata,aux))+')'
+                            else:
+                                print 'Token'+str(aux.type)+'(Linea ' + str(aux.lineno) +', Columna ',
+                                print str(find_column(lexer.lexdata,aux))+')'
+                        print "Symbol Table\n"
+                        print out.printSymTable(0)
+                    else:
+                        print arbol
+                        print "Symbol Table\n"
+                        print out.printSymTable(0)
+                else:
+                    for aux in tokList:
+                        if (aux.type == 'ID') or (aux.type == 'String') or (aux.type == 'Number'):
+                            print 'Token' + str(aux.type) +': "' +str(aux.value)+'"(Linea ',
+                            print  str(aux.lineno) +', Columna '+ str(find_column(lexer.lexdata,aux))+')'
+                        else:
+                            print 'Token'+str(aux.type)+'(Linea ' + str(aux.lineno) +', Columna ',
+                            print str(find_column(lexer.lexdata,aux))+')'
 
-        print arbol
+                    print arbol
+                    print "Symbol Table\n"
+                    print out.printSymTable(0)
     myfile.close()

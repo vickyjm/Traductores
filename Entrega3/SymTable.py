@@ -1,7 +1,15 @@
 # -*- coding: UTF-8 -*-
 
+##########################################
+# CI3715 Traductores e Interpretadores   #
+# Entrega 3. Grupo 6                     #
+# Maria Victoria Jorge 11-10495          #
+# Enrique Iglesias 11-10477              # 
+##########################################
+
+
 class Tabla:
-	def __init__(self,padre):
+	def __init__(self,padre = None):
 		self.dic = {}
 		self.padre = padre
 
@@ -38,9 +46,6 @@ class Tabla:
 			if (self.padre != None):
 				return self.padre.lookup(clave)
 		return None
-
-	def conectFather(self,tabla):
-		self.padre = tabla
 
 	def isValue(self,tipo):
 		claves = self.dic.keys()
