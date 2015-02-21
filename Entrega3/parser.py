@@ -788,6 +788,7 @@ def p_exp(p):
     '''EXP  : Number
             | ID
             | OpenCurly NUMBER_LIST CloseCurly
+            | OpenCurly CloseCurly
             | Lparen EXP Rparen
             | Minus EXP %prec UMINUS
             | EXP Plus EXP
@@ -829,7 +830,10 @@ def p_exp(p):
         p[0] = Simple(tipo,p[1],0,0)
 
     elif (len(p)==3):
-        p[0] = Uniop(p[1],p[2],0,0)
+        if (p[1] == '{'):
+            pass
+        else:
+            p[0] = Uniop(p[1],p[2],0,0)
 
     else:
         if (p[1]=='('):
@@ -842,7 +846,6 @@ def p_exp(p):
 
 def p_inst(p):
     '''INST : ID Assign EXP
-            | OpenCurly CloseCurly
             | OpenCurly DECLARAR INST_LIST CloseCurly
             | OpenCurly INST_LIST CloseCurly
             | Scan ID
@@ -857,8 +860,6 @@ def p_inst(p):
     if (len(p)==3):
         if (p[1]=='scan'):
             p[0] = EntradaSalida(p[1],Simple('id',p[2]))
-        elif (p[1] == '{'):
-            pass
         else:
             p[0] = EntradaSalida(p[1],p[2])
 
