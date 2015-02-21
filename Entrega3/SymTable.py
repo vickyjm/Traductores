@@ -47,9 +47,6 @@ class Tabla:
 				return self.padre.lookup(clave)
 		return None
 
-	def conectFather(self,tabla):
-		self.padre = tabla
-
 	def isValue(self,tipo):
 		claves = self.dic.keys()
 		for i in claves:

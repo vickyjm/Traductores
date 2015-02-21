@@ -213,5 +213,11 @@ if __name__ == '__main__':
         parser = yacc.yacc()
         out = parser.parse(data)
         if not(parser_error):
-            print out.toString(0)
+            #print out.toString(0)
+            out.check()
+            if (len(errorDeclaracion)!=0):
+                print errorDeclaracion
+            else:
+                print "Symbol Table\n"
+                print out.printSymTable(0)
     myfile.close()
