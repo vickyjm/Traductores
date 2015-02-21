@@ -599,13 +599,14 @@ class ListaDeclaracion:
             TS.insert(lista.id1.valor,valDefecto.get(self.tipo),self.tipo)
 
         if (isinstance(lista.idList,ListaID)):
-            for ids in lista.idList:
-                if (TS.isInTable(ids.valor)):
-                    msg = "Error en linea "+ ids.getLinea() + ", columna " + ids.getColumna()
-                    msg += ": La variable "+ ids.valor +" ya se encuentra declarada en este alcance\n"
+            while (lista.idList != None):
+                if (TS.isInTable(lista.idList.id1.valor)):
+                    msg = "Error en linea "+ lista.idList.getLinea() + ", columna " + lista.idList.getColumna()
+                    msg += ": La variable "+ lista.idList.id1.valor +" ya se encuentra declarada en este alcance\n"
                     errorDeclaracion.append(msg)
                 else:
-                    TS.insert(ids.valor,valDefecto.get(self.tipo),self.tipo)
+                    TS.insert(lista.idList.id1.valor,valDefecto.get(self.tipo),self.tipo)
+                lista = lista.idList
 
         if (isinstance(self.decList,ListaDeclaracion)):
             self.decList.check()
@@ -620,9 +621,10 @@ class ListaDeclaracion:
         string = ' '*tabs + 'Variable: ' + lista.id1.valor + ' | Type: ' + self.tipo
         string += ' | Value: ' + str(valDefecto.get(self.tipo)) + '\n'
         if (isinstance(lista.idList,ListaID)):
-            for ids in lista.idList:
-                string += ' '*tabs + 'Variable: ' + ids.valor + ' | Type: ' + self.tipo
+            while (lista.idList != None):
+                string += ' '*tabs + 'Variable: ' + lista.idList.id1.valor + ' | Type: ' + self.tipo
                 string += ' | Value: ' + str(valDefecto.get(self.tipo)) + '\n'
+                lista = lista.idList
 
         if (isinstance(self.decList,ListaDeclaracion)):
             string += self.decList.printSymTable(tabs)
