@@ -229,7 +229,7 @@ if __name__ == '__main__':
         else:
             pass
     elif (len(sys.argv) == 4):
-        if (sys.argv[2] == '-t'):
+        if ((sys.argv[2] in ['-t','-a']) and (sys.argv[3] in ['-t','-a'])):
             for aux in tokList:
                 if (aux.type == 'ID') or (aux.type == 'String') or (aux.type == 'Number'):
                     print 'Token' + str(aux.type) +': "' +str(aux.value)+'"(Linea ',
@@ -237,10 +237,15 @@ if __name__ == '__main__':
                 else:
                     print 'Token'+str(aux.type)+'(Linea ' + str(aux.lineno) +', Columna ',
                     print str(find_column(lexer.lexdata,aux))+')'
-            if (sys.argv[3] == '-a'):
-                print arbol
-            else:
-                pass
+            print arbol
+        elif ((sys.argv[2] in ['-t','-s']) and (sys.argv[3] in ['-t','-s'])):
+            for aux in tokList:
+                if (aux.type == 'ID') or (aux.type == 'String') or (aux.type == 'Number'):
+                    print 'Token' + str(aux.type) +': "' +str(aux.value)+'"(Linea ',
+                    print  str(aux.lineno) +', Columna '+ str(find_column(lexer.lexdata,aux))+')'
+                else:
+                    print 'Token'+str(aux.type)+'(Linea ' + str(aux.lineno) +', Columna ',
+                    print str(find_column(lexer.lexdata,aux))+')'
         else:
             print arbol
     else:
