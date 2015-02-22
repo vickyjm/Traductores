@@ -20,8 +20,8 @@ class Program:
     def toString(self,tabs):
         return 'PROGRAM\n' + self.inst.toString(2)
 
-    def check(self):
-        return self.inst.check()
+    def check(self,line):
+        return self.inst.check(line)
 
     def printSymTable(self,tabs):
         return self.inst.printSymTable(tabs)
@@ -40,11 +40,11 @@ class Bloque:
         string += ' '*tabs + 'BLOCK_END\n'
         return string
 
-    def check(self):
+    def check(self,line):
         if (self.dec != None):
-            self.dec.check()
+            self.dec.check(line)
         if (self.exp != None):
-            self.exp.check()
+            self.exp.check(line)
 
     def printSymTable(self,tabs):
         if (isinstance(self.dec, Declarar)):
@@ -67,8 +67,8 @@ class Declarar:
         string += ' '*tabs + 'IN\n'
         return string
 
-    def check(self):
-        self.lista.check()
+    def check(self,line):
+        self.lista.check(line)
 
     def printSymTable(self,tabs):
         return self.lista.printSymTable(tabs)
@@ -93,22 +93,22 @@ class Condicional:
             string += self.inst2.toString(tabs + 4) 
         return string
 
-    def check(self):
+    def check(self,line):
         global errorDeclaracion
         global TS
-        self.cond.check()
+        self.cond.check(line)
         if (isinstance(self.cond,Simple)):
             if (self.cond.tipo != 'bool'):
-                msg = "Error en linea "+str(self.linea) + ", columna " + str(self.colum)
+                msg = "Error en linea "+str(self.linea - line) + ", columna " + str(self.colum)
                 msg += ": Instruccion 'if' espera expresiones de tipo bool y no "+ self.cond.tipo + "\n"
                 errorDeclaracion.append(msg)    
         elif (self.cond.tipoExpresion() != 'bool'):
-            msg = "Error en linea "+str(self.linea) + ", columna " + str(self.colum)
+            msg = "Error en linea "+str(self.linea - line) + ", columna " + str(self.colum)
             msg += ": Instruccion 'if' espera expresiones de tipo bool y no "+ self.cond.tipoExpresion() + "\n"
             errorDeclaracion.append(msg)
-        self.inst.check()
+        self.inst.check(line)
         if (self.inst2 != None):
-            self.inst2.check()
+            self.inst2.check(line)
         
     def printSymTable(self,tabs):
         string = self.inst.printSymTable(tabs)
@@ -130,32 +130,32 @@ class Asignacion:
         string += self.valor.toString(tabs + 4) 
         return string
 
-    def check(self):
+    def check(self,line):
         global errorDeclaracion
         global TS
         if not(TS.contains(self.var)):
-            msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
-            msg += ": La variable "+self.var+" no ha sido declarada\n"
+            msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+            msg += ": La variable "+str(self.var.valor)+" no ha sido declarada\n"
             errorDeclaracion.append(msg)
         else:
-            self.valor.check()
+            self.valor.check(line)
             info = TS.lookup(self.var)
             if (isinstance(self.valor,Simple)):
                 if (self.valor.tipo != info[1]):
-                    msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
-                    msg += ": No puede asignar algo de tipo "+self.valor.tipo+"a una variable de tipo "+info[1]+"\n"
+                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                    msg += ": No puede asignar algo de tipo "+str(self.valor.tipo)+"a una variable de tipo "+info[1]+"\n"
                     errorDeclaracion.append(msg)
                 elif (self.valor.tipo == 'id'):
                     infoAsig = TS.lookup(self.valor)
                     if (infoAsig[1] != info[1]):
-                        msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
-                        msg += ": No puede asignar algo de tipo "+infoAsig[1]+"a una variable de tipo "+info[1]+"\n"
+                        msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                        msg += ": No puede asignar algo de tipo "+str(infoAsig[1])+"a una variable de tipo "+info[1]+"\n"
                         errorDeclaracion.append(msg)
             else:
-                self.valor.check() #Reviso primero que la expresión sea correcta
+                self.valor.check(line) #Reviso primero que la expresión sea correcta
                 tipoOperador = self.valor.tipoExpresion()
                 if (tipoOperador != info[1]):
-                    msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                     msg += ": No puede asignar algo de tipo "+tipoOperador+"a una variable de tipo "+info[1]+"\n"
                     errorDeclaracion.append(msg)
 
@@ -182,17 +182,17 @@ class For:
         string += self.inst.toString(tabs + 4)
         return string
 
-    def check(self):
+    def check(self,line):
         global errorDeclaracion
         global TS
         TS = Tabla(TS)
         TS.insert(self.id1,0,'int')
         if (self.exp.tipoExpresion() != 'set'):
-            msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+            msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
             msg += ": La instruccion 'for' solo acepta expresiones de tipo 'set' no"+self.exp.tipoExpresion()+"\n"
             errorDeclaracion.append(msg)
-        self.exp.check()
-        self.inst.check()
+        self.exp.check(line)
+        self.inst.check(line)
 
     def printSymTable(self,tabs):
         string = ' '*tabs + 'SCOPE\n'
@@ -216,13 +216,13 @@ class While:
         string += self.inst.toString(tabs + 2)
         return string
 
-    def check(self):
+    def check(self,line):
         global errorDeclaracion
         if (self.exp.tipoExpresion() != 'bool'):
-            msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+            msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
             msg += ": La instruccion 'while' solo acepta expresiones de tipo 'bool' no "+self.exp.tipoExpresion()+"\n"
             errorDeclaracion.append(msg)
-        self.inst.check()
+        self.inst.check(line)
 
     def printSymTable(self,tabs):
         return self.inst1.printSymTable(tabs)
@@ -244,17 +244,17 @@ class EntradaSalida:
                 string += ' '*(tabs + 6) + '"\\n"' + '\n'
         return string
 
-    def check(self):
+    def check(self,line):
         global errorDeclaracion
         global TS
         if (self.flag == 'scan'):
             valores = TS.lookup(self.exp)
             if (valores != None):
                 if ((valores[1] != 'bool') and (valores[1] != 'int')):
-                    msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                     msg += ": La instrucción 'scan' solo acepta variables de tipo 'int' y 'bool' no "+self.exp.tipo+"\n"
                     errorDeclaracion.append(msg)
-        self.exp.check()
+        self.exp.check(line)
 
     def printSymTable(self,tabs):
         return ''
@@ -340,68 +340,68 @@ class Opbin:
             string += self.der.toString(tabs + 2) 
         return string
 
-    def check(self):
+    def check(self,line):
         global errorDeclaracion
         tipoOperador = self.tipoExpresion()
 
         if (isinstance(self.izq,Simple)):
             if (self.op in self.opMixtos) and (self.izq.tipo != 'int'):
-                msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                 msg += ": El operador "+self.op+" espera una expresion de tipo int no " + self.izq.tipo + "\n"
                 errorDeclaracion.append(msg)
             elif (self.izq.tipo != tipoOperador):
-                    msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                     msg += ": Solo acepta expresiones de tipo '"+tipoOperador+"' no"+self.izq.tipoExpresion()+"\n"
                     errorDeclaracion.append(msg)
             if (isinstance(self.der,Simple)):
                 if (self.op in self.opMixtos) and (self.der.tipo != 'set'):
-                    msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                     msg += ": El operador "+self.op+" espera una expresion de tipo set no " + self.der.tipo + "\n"
                     errorDeclaracion.append(msg)
                 elif (self.der.tipo != tipoOperador):
-                    msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                     msg += ": Solo acepta expresiones de tipo '"+tipoOperador+"' no"+self.der.tipoExpresion()+"\n"
                     errorDeclaracion.append(msg) 
             else:
                 if (self.op in self.opMixtos) and (self.der.tipoExpresion() != 'set'):
-                    msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                     msg += ": El operador "+self.op+" espera una expresion de tipo set no " + self.der.tipoExpresion() + "\n"
                     errorDeclaracion.append(msg)
                 elif (self.der.tipoExpresion() == tipoOperador):
-                    self.der.check()
+                    self.der.check(line)
                 else:
-                    msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                     msg += ": Solo acepta expresiones de tipo '"+tipoOperador+"' no"+self.der.tipoExpresion()+"\n"
                     errorDeclaracion.append(msg)
         else:
             if (self.op in self.opMixtos) and (self.izq.tipoExpresion() != 'int'):
-                msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                 msg += ": El operador "+self.op+" espera una expresion de tipo int no " + self.izq.tipoExpresion() + "\n"
                 errorDeclaracion.append(msg)
             elif (self.izq.tipoExpresion() == tipoOperador):
-                self.izq.check()
+                self.izq.check(line)
             else:
-                msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                 msg += ": Solo acepta expresiones de tipo '"+tipoOperador+"' no"+self.izq.tipoExpresion()+"\n"
                 errorDeclaracion.append(msg)
             if (isinstance(self.der,Simple)):
                 if (self.op in self.opMixtos) and (self.der.tipo != 'set'):
-                    msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                     msg += ": El operador "+self.op+" espera una expresion de tipo set no " + self.der.tipo + "\n"
                     errorDeclaracion.append(msg)
                 elif (self.der.tipo != tipoOperador):
-                    msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                     msg += ": Solo acepta expresiones de tipo '"+tipoOperador+"' no"+self.der.tipoExpresion()+"\n"
                     errorDeclaracion.append(msg) 
             else:
                 if (self.op in self.opMixtos) and (self.der.tipoExpresion() != 'set'):
-                    msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                     msg += ": El operador "+self.op+" espera una expresion de tipo set no " + self.der.tipoExpresion() + "\n"
                     errorDeclaracion.append(msg)
                 elif (self.der.tipoExpresion() == tipoOperador):
-                    self.der.check()
+                    self.der.check(line)
                 else:
-                    msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                     msg += ": Solo acepta expresiones de tipo '"+tipoOperador+"' no"+self.der.tipoExpresion()+"\n"
                     errorDeclaracion.append(msg)
 
@@ -428,11 +428,11 @@ class Simple:
             string += ' '*(tabs + 2) + str(self.valor) + '\n'
         return string
 
-    def check(self):
+    def check(self,line):
         global errorDeclaracion
         global TS
         if (self.tipo == 'id') and (TS.contains(self.valor) == None):
-            msg = "Error en la linea "+str(self.linea)+", columna "+str(self.column)
+            msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.column)
             msg += ": La variable "+self.valor+" no ha sido declarada\n"
             errorDeclaracion.append(msg)
 
@@ -459,22 +459,22 @@ class Repeat:
             string += self.inst2.toString(tabs + 2)
         return string
 
-    def check(self):
+    def check(self,line):
         global errorDeclaracion
-        self.inst1.check()
+        self.inst1.check(line)
         if (isinstance(self.exp,Simple) and (self.exp.tipo != 'bool')):
-            msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+            msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
             msg += ": Solo acepta expresiones de tipo 'bool' no"+self.der.tipoExpresion()+"\n"
             errorDeclaracion.append(msg)
         else:
             if (self.exp.tipoExpresion() == 'bool'):
-                self.exp.check()
+                self.exp.check(line)
             else:
-                msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                 msg += ": Solo acepta expresiones de tipo 'bool' no"+self.der.tipoExpresion()+"\n"
                 errorDeclaracion.append(msg)
         if (self.inst2 != None):
-            self.inst2.check()
+            self.inst2.check(line)
 
     def printSymTable(self,tabs):
         string = self.inst1.printSymTable(tabs)
@@ -511,21 +511,21 @@ class Uniop:
         string += self.val.toString(tabs + 2) 
         return string
 
-    def check(self):
+    def check(self,line):
         global errorDeclaracion
         tipoOperador = self.tipoExpresion()
         if (isinstance(self.val,Simple)):
             if (self.val.tipo != tipoOperador):
-                msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                 msg += ": Solo acepta expresiones de tipo '"+tipoOperador+"' no"+self.val.tipo+"\n"
                 errorDeclaracion.append(msg)
         else:
             if (self.val.tipoExpresion() != tipoOperador):
-                msg = "Error en la linea "+str(self.linea)+", columna "+str(self.colum)
+                msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                 msg += ": Solo acepta expresiones de tipo '"+tipoOperador+"' no"+self.val.tipoExpresion()+"\n"
                 errorDeclaracion.append(msg)
             else: 
-                self.val.check()
+                self.val.check(line)
 
     def printSymTable(self,tabs):
         return ''
@@ -540,7 +540,7 @@ class CadenaString:
         string += ' '*(tabs + 2) + '"' + self.string + '"' + '\n'
         return string
 
-    def check(self):
+    def check(self,line):
         pass
 
     def printSymTable(self,tabs):
@@ -557,10 +557,10 @@ class ListaInstruccion:
             string += self.inst2.toString(tabs)
         return string
 
-    def check(self):
-        self.inst1.check()
+    def check(self,line):
+        self.inst1.check(line)
         if (self.inst2 != None):
-            self.inst2.check()
+            self.inst2.check(line)
 
     def printSymTable(self,tabs):
         string = self.inst1.printSymTable(tabs)
@@ -581,7 +581,7 @@ class ListaDeclaracion:
             string += self.decList.toString(tabs)
         return string
 
-    def check(self):
+    def check(self,line):
         global TS
         global errorDeclaracion
         TS = Tabla(TS) #Enlazo las tablas
@@ -609,7 +609,7 @@ class ListaDeclaracion:
                 lista = lista.idList
 
         if (isinstance(self.decList,ListaDeclaracion)):
-            self.decList.check()
+            self.decList.check(line)
 
     def printSymTable(self,tabs):
         valDefecto = {
@@ -642,7 +642,7 @@ class ListaID:
         string += self.id1.toString(tabs)
         return string
 
-    def check(self):
+    def check(self,line):
         pass
 
     def printSymTable(self,tabs):
@@ -660,7 +660,7 @@ class ListaNumero:
         string += self.num.toString(tabs)
         return string
 
-    def check(self):
+    def check(self,line):
         global TS
         global errorDeclaracion
         if (isinstance(num,Simple)): 
@@ -680,7 +680,7 @@ class ListaNumero:
                     msg += ": La variable "+self.num.valor+" no ha sido declarada\n"
                     errorDeclaracion.append(msg)
 
-        self.numList.check()
+        self.numList.check(line)
 
     def printSymTable(self,tabs):
         return ''
@@ -697,9 +697,9 @@ class ListaImpresion:
         string += self.exp.toString(tabs)
         return string
 
-    def check(self):
-        self.exp.check()
-        self.listExp.check()
+    def check(self,line):
+        self.exp.check(line)
+        self.listExp.check(line)
 
     def printSymTable(self,tabs):
         return ''
@@ -780,9 +780,9 @@ def p_idList(p):
     '''ID_LIST    : ID_LIST Comma ID 
                     | ID '''
     if (len(p)==2):
-        p[0] = ListaID(None,Simple('id',p[1],0,0))
+        p[0] = ListaID(None,Simple('id',p[1],p.lineno(1),p.lexpos(1)))
     else:
-        p[0] = ListaID(p[1],Simple('id',p[3],0,0))
+        p[0] = ListaID(p[1],Simple('id',p[3],p.lineno(1),0))
 
 def p_exp(p):
     '''EXP  : Number
@@ -827,21 +827,21 @@ def p_exp(p):
             tipo = 'bool'
         else:
             tipo = 'id'
-        p[0] = Simple(tipo,p[1],0,0)
+        p[0] = Simple(tipo,p[1],p.lineno(1),0)
 
     elif (len(p)==3):
         if (p[1] == '{'):
             pass
         else:
-            p[0] = Uniop(p[1],p[2],0,0)
+            p[0] = Uniop(p[1],p[2],p.lineno(1),0)
 
     else:
         if (p[1]=='('):
             p[0] = p[2]
         elif (p[1]=='{'):
-            p[0] = Simple('set',p[2],0,0)
+            p[0] = Simple('set',p[2],p.lineno(1),0)
         else:
-            p[0] = Opbin(p[1],p[2],p[3],0,0)
+            p[0] = Opbin(p[1],p[2],p[3],p.lineno(1),0)
 
 
 def p_inst(p):
@@ -867,7 +867,7 @@ def p_inst(p):
         if (p[1]=='{'):
             p[0] = Bloque(None,p[2])
         else:
-            p[0] = Asignacion(Simple('id',p[1],0,0),p[3])
+            p[0] = Asignacion(Simple('id',p[1],p.lineno(1),0),p[3],p.lineno(1),0)
 
     elif (len(p)==5):
         if (p[1]=='{'):
@@ -878,11 +878,11 @@ def p_inst(p):
             p[0] = While(p[2],p[4])
 
     elif (len(p)==6):
-        p[0] = Condicional(p[3],p[5],None,0,0)
+        p[0] = Condicional(p[3],p[5],None,p.lineno(1),0)
 
     elif (len(p)==7):
         if (p[1]=='for'):
-            p[0] = For(Simple('int',p[2],0,0),p[3],p[4],p[6],0,0)
+            p[0] = For(Simple('int',p[2],p.lineno(1),0),p[3],p[4],p[6],p.lineno(1),0)
         else:
             p[0] = Repeat(p[2],p[4],p[6])
     else:
@@ -901,19 +901,19 @@ def p_numberList(p):
     else:
         p[0] = ListaNumero(p[1],p[3])
 
-def nrolineas(fname):
+def find_row(input):
     nro_linea = 0
-    archivo = open(fname, "r")
-    for linea in archivo:
-        nro_linea += 1
-    return nro_linea 
+    with open(input,'r') as archivo:
+        for linea in archivo:
+            nro_linea += 1
+    return nro_linea
 
-def p_error(p):
-    global parser_error
-    if (p is not None):
-        msg = "Error de sintaxis. Se encontró token " + str(p.value) + " en la linea "
-        msg += str(p.lineno) + ", columna " + str(find_column(lexer.lexdata,p))
-    else:
-        msg = "Error de sintaxis al final del archivo"
-    print msg
-    parser_error = True
+# Permite encontrar el numero de columna de la linea actual
+def find_column(input,token):
+    last_cr = input.rfind('\n',0,token.lexpos)
+    if last_cr < 0:
+        last_cr = -1
+    column = token.lexpos - last_cr
+    return column 
+
+
