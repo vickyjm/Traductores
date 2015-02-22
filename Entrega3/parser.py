@@ -397,7 +397,7 @@ class Opbin:
                 errorDeclaracion.append(msg)
             elif (self.izq.tipo != tipoOperador):
                     msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                    msg += ": Solo acepta expresiones de tipo '"+tipoOperador+"' no"+self.izq.tipoExpresion()+"\n"
+                    msg += ": Solo acepta expresiones de tipo '"+tipoOperador+"' no"+self.izq.tipo+"\n"
                     errorDeclaracion.append(msg)
             if (isinstance(self.der,Simple)):
                 valores = TS.lookup(self.der.valor)
