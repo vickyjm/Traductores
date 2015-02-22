@@ -317,12 +317,12 @@ class Opbin:
             '<*>'   : 'set',
             '</>'   : 'set',
             '<%>'   : 'set',
-            '<'     : 'bool',
-            '<='    : 'bool',
-            '>'     : 'bool',
-            '>='    : 'bool',
-            '=='    : 'bool',
-            '/='    : 'bool',
+            '<'     : 'int',
+            '<='    : 'int',
+            '>'     : 'int',
+            '>='    : 'int',
+            '=='    : 'esp', # especial porque los operandos pueden ser de cualquier tipo
+            '/='    : 'esp',
             '@'     : 'bool',
             'or'    : 'bool',
             'and'   : 'bool' 
@@ -405,100 +405,68 @@ class Opbin:
     def check(self,line):
         global errorDeclaracion
         global TS
-        tipoOperador = self.tipoExpresion()
+        tipoOperandos = self.tipoOperandos.get(self.op)
+        esOpEspecial = (self.tipoOperandos.get(self.op) == 'esp')
+        self.izq.check(line)
+        self.der.check(line)
 
         if (isinstance(self.izq,Simple)):
             valores = TS.lookup(self.izq.valor)
-            if (self.izq.tipo == 'id') and (valores != None):
-                print "HOLA"
-                print self.izq.valor
+            if (self.izq.tipo == 'id') and (valores[1] != None):
                 if (self.op in self.opMixtos) and (valores[1] != 'int'):
                     msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                     msg += ": El operador "+self.op+" espera una expresion de tipo int no " + valores[1] + "\n"
                     errorDeclaracion.append(msg)    
-                elif (valores[1] != tipoOperador):
+                elif (valores[1] != tipoOperandos) and not(esOpEspecial):
                     msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                    msg += ": El operador "+self.op+" solo acepta expresiones de tipo '"+tipoOperador+"' no "+valores[1]+"\n"
+                    msg += ": El operador "+self.op+" solo acepta expresiones de tipo '"+tipoOperandos+"' no "+valores[1]+"\n"
                     errorDeclaracion.append(msg)
             elif (self.op in self.opMixtos) and (self.izq.tipo != 'int'):
                 msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                 msg += ": El operador "+self.op+" espera una expresion de tipo int no " + self.izq.tipo + "\n"
                 errorDeclaracion.append(msg)
-            elif (self.izq.tipo != tipoOperador):
+            elif (self.izq.tipo != tipoOperandos) and not(esOpEspecial):
                     msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                    msg += ": El operador "+self.op+" solo acepta expresiones de tipo '"+tipoOperador+"' no "+self.izq.tipo+"\n"
-                    errorDeclaracion.append(msg)
-            if (isinstance(self.der,Simple)):
-                valores = TS.lookup(self.der.valor)
-                if (self.der.tipo == 'id') and (valores != None):
-                    if (self.op in self.opMixtos) and (valores[1] != 'int'):
-                        msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                        msg += ": El operador "+self.op+" espera una expresion de tipo int no " + valores[1] + "\n"
-                        errorDeclaracion.append(msg)    
-                    elif (valores[1] != tipoOperador):
-                        msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                        msg += ": El operador "+self.op+" solo acepta expresiones de tipo '"+tipoOperador+"' no "+valores[1]+"\n"
-                        errorDeclaracion.append(msg)
-                elif (self.op in self.opMixtos) and (self.der.tipo != 'set'):
-                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                    msg += ": El operador "+self.op+" espera una expresion de tipo set no " + self.der.tipo + "\n"
-                    errorDeclaracion.append(msg)
-                elif (self.der.tipo != tipoOperador):
-                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                    msg += ": El operador "+self.op+" solo acepta expresiones de tipo '"+tipoOperador+"' no "+self.der.tipo+"\n"
-                    errorDeclaracion.append(msg) 
-            else:
-                if (self.op in self.opMixtos) and (self.der.tipoExpresion() != 'set'):
-                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                    msg += ": El operador "+self.op+" espera una expresion de tipo set no " + self.der.tipoExpresion() + "\n"
-                    errorDeclaracion.append(msg)
-                elif (self.der.tipoExpresion() == tipoOperador):
-                    self.der.check(line)
-                else:
-                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                    msg += ": El operador "+self.op+" solo acepta expresiones de tipo '"+tipoOperador+"' no "+self.der.tipoExpresion()+"\n"
+                    msg += ": El operador "+self.op+" solo acepta expresiones de tipo '"+tipoOperandos+"' no "+self.izq.tipo+"\n"
                     errorDeclaracion.append(msg)
         else:
             if (self.op in self.opMixtos) and (self.izq.tipoExpresion() != 'int'):
                 msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                 msg += ": El operador "+self.op+" espera una expresion de tipo int no " + self.izq.tipoExpresion() + "\n"
                 errorDeclaracion.append(msg)
-            elif (self.izq.tipoExpresion() == tipoOperador):
-                self.izq.check(line)
-            else:
+            elif (self.izq.tipoExpresion() != tipoOperandos) and not(esOpEspecial):
                 msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                msg += ": El operador "+self.op+" solo acepta expresiones de tipo '"+tipoOperador+"' no "+self.izq.tipoExpresion()+"\n"
+                msg += ": El operador "+self.op+" solo acepta expresiones de tipo '"+tipoOperandos+"' no "+self.izq.tipoExpresion()+"\n"
                 errorDeclaracion.append(msg)
-            if (isinstance(self.der,Simple)):
-                valores = TS.lookup(self.der.valor)
-                if (self.der.tipo == 'id') and (valores != None):
-                    if (self.op in self.opMixtos) and (valores[1] != 'int'):
-                        msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                        msg += ": El operador "+self.op+" espera una expresion de tipo int no " + valores[1] + "\n"
-                        errorDeclaracion.append(msg)    
-                    elif (valores[1] != tipoOperador):
-                        msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                        msg += ": El operador "+self.op+" solo acepta expresiones de tipo '"+tipoOperador+"' no "+valores[1]+"\n"
-                        errorDeclaracion.append(msg)
-                elif (self.op in self.opMixtos) and (self.der.tipo != 'set'):
+
+        if (isinstance(self.der,Simple)):
+            valores = TS.lookup(self.der.valor)
+            if (self.der.tipo == 'id') and (valores[1] != None):
+                if (self.op in self.opMixtos) and (valores[1] != 'int'):
                     msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                    msg += ": El operador "+self.op+" espera una expresion de tipo set no " + self.der.tipo + "\n"
+                    msg += ": El operador "+self.op+" espera una expresion de tipo int no " + valores[1] + "\n"
+                    errorDeclaracion.append(msg)    
+                elif (valores[1] != tipoOperandos) and not(esOpEspecial):
+                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                    msg += ": El operador "+self.op+" solo acepta expresiones de tipo '"+tipoOperandos+"' no "+valores[1]+"\n"
                     errorDeclaracion.append(msg)
-                elif (self.der.tipo != tipoOperador):
-                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                    msg += ": El operador "+self.op+" solo acepta expresiones de tipo '"+tipoOperador+"' no "+self.der.tipoExpresion()+"\n"
-                    errorDeclaracion.append(msg) 
-            else:
-                if (self.op in self.opMixtos) and (self.der.tipoExpresion() != 'set'):
-                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                    msg += ": El operador "+self.op+" espera una expresion de tipo set no " + self.der.tipoExpresion() + "\n"
-                    errorDeclaracion.append(msg)
-                elif (self.der.tipoExpresion() == tipoOperador):
-                    self.der.check(line)
-                else:
-                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                    msg += ": El operador "+self.op+" solo acepta expresiones de tipo '"+tipoOperador+"' no "+self.der.tipoExpresion()+"\n"
-                    errorDeclaracion.append(msg)
+            elif (self.op in self.opMixtos) and (self.der.tipo != 'set'):
+                msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                msg += ": El operador "+self.op+" espera una expresion de tipo set no " + self.der.tipo + "\n"
+                errorDeclaracion.append(msg)
+            elif (self.der.tipo != tipoOperandos) and not(esOpEspecial):
+                msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                msg += ": El operador "+self.op+" solo acepta expresiones de tipo '"+tipoOperandos+"' no "+self.der.tipo+"\n"
+                errorDeclaracion.append(msg) 
+        else:
+            if (self.op in self.opMixtos) and (self.der.tipoExpresion() != 'set'):
+                msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                msg += ": El operador "+self.op+" espera una expresion de tipo set no " + self.der.tipoExpresion() + "\n"
+                errorDeclaracion.append(msg)
+            elif (self.der.tipoExpresion() != tipoOperandos) and not(esOpEspecial):
+                msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                msg += ": El operador "+self.op+" solo acepta expresiones de tipo '"+tipoOperandos+"' no "+self.der.tipoExpresion()+"\n"
+                errorDeclaracion.append(msg)
 
     def printSymTable(self,tabs):
         return ''
@@ -880,7 +848,7 @@ def p_instList(p):
     if (len(p)==4):
         p[0] = ListaInstruccion(p[1],p[3])
     elif (len(p)==2):
-        pass
+	pass
 
 
 def p_idList(p):

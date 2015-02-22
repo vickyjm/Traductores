@@ -1,0 +1,11 @@
+program {
+    using bool x;
+        int y; in
+
+    scan y;
+
+    if (x ) {
+        print "less";
+    }; 
+
+}
