@@ -640,6 +640,8 @@ class ListaInstruccion:
 
     def printSymTable(self,tabs):
         string = self.inst1.printSymTable(tabs)
+        print("Buenas")
+        print(self.inst2)
         if (self.inst2 != None):
             string += self.inst2.printSymTable(tabs)
         return string
@@ -780,6 +782,7 @@ class ListaImpresion:
         return ''
         
 precedence = (
+    ('right','IFX'),
     ('right','ELSE'),
     ('left', 'Or'),
     ('left', 'And'),        
@@ -926,7 +929,7 @@ def p_inst(p):
             | Scan ID
             | Print ENUM_LIST
             | Println ENUM_LIST
-            | IF Lparen EXP Rparen INST
+            | IF Lparen EXP Rparen INST %prec IFX
             | IF Lparen EXP Rparen INST ELSE INST
             | FOR ID DIRECCION EXP DO INST
             | REPEAT INST WHILE EXP
@@ -934,7 +937,7 @@ def p_inst(p):
             | WHILE EXP DO INST'''
     if (len(p)==3):
         if (p[1]=='scan'):
-            p[0] = EntradaSalida(p[1],Simple('id',p[2],p.lineno(1),find_column2(p.lexer.lexdata,p,1))))
+            p[0] = EntradaSalida(p[1],Simple('id',p[2],p.lineno(1),find_column2(p.lexer.lexdata,p,1)))
         else:
             p[0] = EntradaSalida(p[1],p[2])
 
@@ -942,25 +945,27 @@ def p_inst(p):
         if (p[1]=='{'):
             p[0] = Bloque(None,p[2])
         else:
-            p[0] = Asignacion(Simple('id',p[1],p.lineno(1),find_column2(p.lexer.lexdata,p,1))),p[3],p.lineno(3),find_column2(p.lexer.lexdata,p,3))
+            p[0] = Asignacion(Simple('id',p[1],p.lineno(1),find_column2(p.lexer.lexdata,p,1)),p[3],p.lineno(3),find_column2(p.lexer.lexdata,p,3))
     elif (len(p)==5):
         if (p[1]=='{'):
             p[0] = Bloque(p[2],p[3])
         elif (p[1]=='repeat'):
-            p[0] = Repeat(p[2],p[4],None,p.lineno(1),find_column2(p.lexer.lexdata,p,1)))
+            p[0] = Repeat(p[2],p[4],None,p.lineno(1),find_column2(p.lexer.lexdata,p,1))
         else:
             p[0] = While(p[2],p[4],p.lineno(1),find_column2(p.lexer.lexdata,p,1))
 
     elif (len(p)==6):
-        p[0] = Condicional(p[3],p[5],None,p.lineno(1),find_column2(p.lexer.lexdata,p,1)))
+        print("Noches")
+        print(p[3])
+        p[0] = Condicional(p[3],p[5],None,p.lineno(1),find_column2(p.lexer.lexdata,p,1))
 
     elif (len(p)==7):
         if (p[1]=='for'):
-            p[0] = For(Simple('int',p[2],p.lineno(1),find_column2(p.lexer.lexdata,p,1)),p[3],p[4],p[6],p.lineno(1),find_column2(p.lexer.lexdata,p,1)))
+            p[0] = For(Simple('int',p[2],p.lineno(1),find_column2(p.lexer.lexdata,p,1)),p[3],p[4],p[6],p.lineno(1),find_column2(p.lexer.lexdata,p,1))
         else:
-            p[0] = Repeat(p[2],p[4],p[6],p.lineno(1),find_column2(p.lexer.lexdata,p,1)))
+            p[0] = Repeat(p[2],p[4],p[6],p.lineno(1),find_column2(p.lexer.lexdata,p,1))
     else:
-        p[0] = Condicional(p[3],p[5],p[7],p.lineno(1),find_column2(p.lexer.lexdata,p,1)))
+        p[0] = Condicional(p[3],p[5],p[7],p.lineno(1),find_column2(p.lexer.lexdata,p,1))
 
 def p_direccion(p):
     ''' DIRECCION : MIN
