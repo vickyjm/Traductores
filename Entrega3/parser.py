@@ -887,9 +887,9 @@ def p_idList(p):
     '''ID_LIST    : ID_LIST Comma ID 
                     | ID '''
     if (len(p)==2):
-        p[0] = ListaID(None,Simple('id',p[1],p.lineno(1),p.lexpos(1)))
+        p[0] = ListaID(None,Simple('id',p[1],p.lineno(1),find_column2(p.lexer.lexdata,p,1)))
     else:
-        p[0] = ListaID(p[1],Simple('id',p[3],p.lineno(1),0))
+        p[0] = ListaID(p[1],Simple('id',p[3],p.lineno(1),find_column2(p.lexer.lexdata,p,1)))
 
 def p_exp(p):
     '''EXP  : Number
@@ -934,21 +934,21 @@ def p_exp(p):
             tipo = 'bool'
         else:
             tipo = 'id'
-        p[0] = Simple(tipo,p[1],p.lineno(1),0)
+        p[0] = Simple(tipo,p[1],p.lineno(1),find_column2(p.lexer.lexdata,p,1))
 
     elif (len(p)==3):
         if (p[1] == '{'):
-            p[0] = Simple('set',None,p.lineno(1),0)
+            p[0] = Simple('set',None,p.lineno(1),find_column2(p.lexer.lexdata,p,1))
         else:
-            p[0] = Uniop(p[1],p[2],p.lineno(1),0)
+            p[0] = Uniop(p[1],p[2],p.lineno(1),find_column2(p.lexer.lexdata,p,1))
 
     else:
         if (p[1]=='('):
             p[0] = p[2]
         elif (p[1]=='{'):
-            p[0] = Simple('set',p[2],p.lineno(1),0)
+            p[0] = Simple('set',p[2],p.lineno(1),find_column2(p.lexer.lexdata,p,1))
         else:
-            p[0] = Opbin(p[1],p[2],p[3],p.lineno(1),0)
+            p[0] = Opbin(p[1],p[2],p[3],p.lineno(1),find_column2(p.lexer.lexdata,p,1))
 
 
 def p_inst(p):
@@ -966,7 +966,7 @@ def p_inst(p):
             | WHILE EXP DO INST'''
     if (len(p)==3):
         if (p[1]=='scan'):
-            p[0] = EntradaSalida(p[1],Simple('id',p[2],p.lineno(1),0))
+            p[0] = EntradaSalida(p[1],Simple('id',p[2],p.lineno(1),find_column2(p.lexer.lexdata,p,1))))
         else:
             p[0] = EntradaSalida(p[1],p[2])
 
@@ -974,25 +974,25 @@ def p_inst(p):
         if (p[1]=='{'):
             p[0] = Bloque(None,p[2])
         else:
-            p[0] = Asignacion(Simple('id',p[1],p.lineno(1),0),p[3],p.lineno(1),0)
+            p[0] = Asignacion(Simple('id',p[1],p.lineno(1),find_column2(p.lexer.lexdata,p,1))),p[3],p.lineno(3),find_column2(p.lexer.lexdata,p,3))
     elif (len(p)==5):
         if (p[1]=='{'):
             p[0] = Bloque(p[2],p[3])
         elif (p[1]=='repeat'):
-            p[0] = Repeat(p[2],p[4],None,p.lineno(1),0)
+            p[0] = Repeat(p[2],p[4],None,p.lineno(1),find_column2(p.lexer.lexdata,p,1)))
         else:
-            p[0] = While(p[2],p[4],p.lineno(1),0)
+            p[0] = While(p[2],p[4],p.lineno(1),find_column2(p.lexer.lexdata,p,1))
 
     elif (len(p)==6):
-        p[0] = Condicional(p[3],p[5],None,p.lineno(1),0)
+        p[0] = Condicional(p[3],p[5],None,p.lineno(1),find_column2(p.lexer.lexdata,p,1)))
 
     elif (len(p)==7):
         if (p[1]=='for'):
-            p[0] = For(Simple('int',p[2],p.lineno(1),0),p[3],p[4],p[6],p.lineno(1),0)
+            p[0] = For(Simple('int',p[2],p.lineno(1),find_column2(p.lexer.lexdata,p,1)),p[3],p[4],p[6],p.lineno(1),find_column2(p.lexer.lexdata,p,1)))
         else:
-            p[0] = Repeat(p[2],p[4],p[6],p.lineno(1),0)
+            p[0] = Repeat(p[2],p[4],p[6],p.lineno(1),find_column2(p.lexer.lexdata,p,1)))
     else:
-        p[0] = Condicional(p[3],p[5],p[7],p.lineno(1),0)
+        p[0] = Condicional(p[3],p[5],p[7],p.lineno(1),find_column2(p.lexer.lexdata,p,1)))
 
 def p_direccion(p):
     ''' DIRECCION : MIN
@@ -1032,4 +1032,9 @@ def find_column(input,token):
     column = token.lexpos - last_cr
     return column 
 
-
+def find_column2(input,token,nro):
+    last_cr = input.rfind('\n',0,token.lexpos(nro))
+    if last_cr < 0:
+        last_cr = -1
+    column = token.lexpos(nro) - last_cr
+    return column 
