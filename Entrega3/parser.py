@@ -303,6 +303,30 @@ class Opbin:
         self.op = op
         self.der = der
         self.opMixtos = set(['<+>','<->','<*>','</>','@'])
+        self.tipoOperandos = {
+            '+'     : 'int',
+            '-'     : 'int',
+            '*'     : 'int',
+            '/'     : 'int',
+            '%'     : 'int',
+            '++'    : 'set',
+            '><'    : 'set',
+            '\\'    : 'set',
+            '<+>'   : 'set',
+            '<->'   : 'set',
+            '<*>'   : 'set',
+            '</>'   : 'set',
+            '<%>'   : 'set',
+            '<'     : 'bool',
+            '<='    : 'bool',
+            '>'     : 'bool',
+            '>='    : 'bool',
+            '=='    : 'bool',
+            '/='    : 'bool',
+            '@'     : 'bool',
+            'or'    : 'bool',
+            'and'   : 'bool' 
+        }
         self.linea = linea
         self.colum = columna
 
@@ -386,6 +410,8 @@ class Opbin:
         if (isinstance(self.izq,Simple)):
             valores = TS.lookup(self.izq.valor)
             if (self.izq.tipo == 'id') and (valores != None):
+                print "HOLA"
+                print self.izq.valor
                 if (self.op in self.opMixtos) and (valores[1] != 'int'):
                     msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                     msg += ": El operador "+self.op+" espera una expresion de tipo int no " + valores[1] + "\n"
@@ -980,6 +1006,16 @@ def p_numberList(p):
         p[0] = p[1]
     else:
         p[0] = ListaNumero(p[1],p[3])
+
+def p_error(p):
+    global parser_error
+    if (p is not None):
+        msg = "Error de sintaxis. Se encontró token " + str(p.value) + " en la linea "
+        msg += str(p.lineno - find_row(archivo)) + ", columna " + str(find_column(lexer.lexdata,p))
+    else:
+        msg = "Error de sintaxis al final del archivo"
+    print msg
+    parser_error = True
 
 def find_row(input):
     nro_linea = 0
