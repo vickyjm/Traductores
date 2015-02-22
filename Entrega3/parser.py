@@ -491,7 +491,8 @@ class Simple:
             string += ' '*(tabs + 2) + str(self.valor) + '\n'
         elif (self.tipo=='set'):
             string = ' '*tabs + self.tipo + '\n'
-            string += self.valor.toString(tabs + 2)
+            if (self.valor != None):
+                string += self.valor.toString(tabs + 2)
         else:    
             string = ' '*tabs + self.tipo + '\n'
             string += ' '*(tabs + 2) + str(self.valor) + '\n'
@@ -911,7 +912,7 @@ def p_exp(p):
 
     elif (len(p)==3):
         if (p[1] == '{'):
-            pass
+            p[0] = Simple('set',None,p.lineno(1),0)
         else:
             p[0] = Uniop(p[1],p[2],p.lineno(1),0)
 
