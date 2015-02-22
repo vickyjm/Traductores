@@ -47,6 +47,9 @@ class Tabla:
 				return self.padre.lookup(clave)
 		return None
 
+	def getFather(self):
+		return self.padre
+
 	def isValue(self,tipo):
 		claves = self.dic.keys()
 		for i in claves:
