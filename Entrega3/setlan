@@ -241,7 +241,9 @@ if __name__ == '__main__':
                         print arbol
                     else:
                         print "Symbol Table\n"
-                        print out.printSymTable(0)
+                        tabla = out.printSymTable(0)
+                        if (tabla!=None):
+                            print tabla
                 elif (len(sys.argv) == 4):
                     if ((sys.argv[2] in ['-t','-a']) and (sys.argv[3] in ['-t','-a'])):
                         for aux in tokList:
@@ -261,11 +263,15 @@ if __name__ == '__main__':
                                 print 'Token'+str(aux.type)+'(Linea ' + str(aux.lineno) +', Columna ',
                                 print str(find_column(lexer.lexdata,aux))+')'
                         print "Symbol Table\n"
-                        print out.printSymTable(0)
+                        tabla = out.printSymTable(0)
+                        if (tabla!=None):
+                            print tabla
                     else:
                         print arbol
                         print "Symbol Table\n"
-                        print out.printSymTable(0)
+                        tabla = out.printSymTable(0)
+                        if (tabla!=None):
+                            print tabla
                 else:
                     for aux in tokList:
                         if (aux.type == 'ID') or (aux.type == 'String') or (aux.type == 'Number'):
@@ -277,5 +283,7 @@ if __name__ == '__main__':
 
                     print arbol
                     print "Symbol Table\n"
-                    print out.printSymTable(0)
+                    tabla = out.printSymTable(0)
+                    if (tabla!=None):
+                        print tabla
     myfile.close()
