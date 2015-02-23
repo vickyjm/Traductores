@@ -13,7 +13,12 @@ Implementación:
 	Para la Tabla de Símbolos utilizamos la estructura de diccionario de Python. La clave es el identificador
 	de la variable y el valor es una lista de dos elementos, en la primera posición se encuentra el valor
 	de la variable (para esta entrega es el valor por defecto según el tipo) y en la segunda posición se encuentra
-	el tipo de la variable (int, set o bool).
+	el tipo de la variable (int, set o bool). Cada tabla apunta a su tabla padre. Las tablas de símbolos se manejan
+	con una variable global.
+
+	Al inicio de cada bloque o de una instrucción for se crea una nueva tabla de símbolos y se enlaza con la tabla
+	anterior que será su padre. Al finalizar el bloque o la instrucción for se regresa a la tabla padre ya que el
+	alcance del bloque o for que está terminando no influye en las siguientes instrucciones.
 
 
 Aclaratorias:
