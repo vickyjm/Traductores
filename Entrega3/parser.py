@@ -858,7 +858,7 @@ def p_idList(p):
     if (len(p)==2):
         p[0] = ListaID(None,Simple('id',p[1],p.lineno(1),find_column2(p.lexer.lexdata,p,1)))
     else:
-        p[0] = ListaID(p[1],Simple('id',p[3],p.lineno(1),find_column2(p.lexer.lexdata,p,1)))
+        p[0] = ListaID(p[1],Simple('id',p[3],p.lineno(2),find_column2(p.lexer.lexdata,p,1)))
 
 def p_exp(p):
     '''EXP  : Number
@@ -917,7 +917,7 @@ def p_exp(p):
         elif (p[1]=='{'):
             p[0] = Simple('set',p[2],p.lineno(1),find_column2(p.lexer.lexdata,p,1))
         else:
-            p[0] = Opbin(p[1],p[2],p[3],p.lineno(1),find_column2(p.lexer.lexdata,p,1))
+            p[0] = Opbin(p[1],p[2],p[3],p.lineno(2),find_column2(p.lexer.lexdata,p,1))
 
 
 def p_inst(p):
