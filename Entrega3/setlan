@@ -176,10 +176,6 @@ if __name__ == '__main__':
 
     # Variable global donde se almacenan los errores del lexer en caso de existir
     global error
-    # Variable global donde se almacenan el primer error del parser en caso de existir
-    global parser_error
-    global archivo
-    parser_error = False
     error = []
     tokList = []
     lexer = lex.lex()
@@ -219,7 +215,7 @@ if __name__ == '__main__':
     else:
         parser = yacc.yacc()
         out = parser.parse(data)
-        if not(parser_error):
+        if not(iserror()):
             arbol = out.toString(0)
             out.check(find_row(archivo))
             if (len(errorDeclaracion)!=0):

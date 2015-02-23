@@ -1002,6 +1002,10 @@ def p_error(p):
     print msg
     parser_error = True
 
+def iserror():
+    global parser_error
+    return parser_error
+
 def find_row(input):
     nro_linea = 0
     with open(input,'r') as archivo:
@@ -1030,3 +1034,6 @@ def find_column2(input,token,nro):
         last_cr = -1
     column = token.lexpos(nro) - last_cr
     return column 
+
+global parser_error
+parser_error = False
