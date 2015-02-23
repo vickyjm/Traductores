@@ -780,22 +780,34 @@ class ListaImpresion:
         return ''
         
 precedence = (
+    # Precedencia del if
     ('right','IFX'),
     ('right','ELSE'),
+
+    # Operadores booleanos
     ('left', 'Or'),
     ('left', 'And'),        
     ('right', 'Not'),
+
+    # Operadores comparativos
     ('nonassoc','Greater','GreaterEqual', 'Less','LessEqual'),    
-    ('right', 'MinSet', 'MaxSet', 'Size'),
-    ('left', 'TimesMap','DivideMap','ModuleMap'),
-    ('left','PlusMap','MinusMap'),
-    ('left','Intersection'),
-    ('left','Union','Diference'),
-    ('left', 'Plus', 'Minus'),
-    ('left','Times','Divide','Module'),
     ('left','Equals','NotEqual'),
     ('nonassoc','At'),
-    ('right', 'UMINUS')
+
+    # Operadores aritméticos
+    ('left', 'Plus', 'Minus'),
+    ('left','Times','Divide','Module'),
+
+    # Operadores de conjuntos
+    ('left','Union','Diference'),
+    ('left','Intersection'),
+
+    # Operadores conjunto-aritméticos
+    ('left','PlusMap','MinusMap'),
+    ('left', 'TimesMap','DivideMap','ModuleMap'),
+
+    # Operadores unarios
+    ('right', 'UMINUS','MinSet','MaxSet','Size')
     )
 
 def p_program(p):
