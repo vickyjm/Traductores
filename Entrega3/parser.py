@@ -10,8 +10,6 @@
 from SymTable import *
 global errorDeclaracion
 global TS
-global numero
-numero = 0
 TS = None
 errorDeclaracion = []
 
@@ -150,7 +148,7 @@ class Asignacion:
             msg += ": La variable "+str(self.var.valor)+" no ha sido declarada\n"
             errorDeclaracion.append(msg)
         else:
-            self.valor.check(line)
+            self.valor.check(line) # Reviso primero que la expresión sea correcta
             info = TS.lookup(self.var.valor)
             if (isinstance(self.valor,Simple)):
                 infoAsig = TS.lookup(self.valor.valor)
@@ -163,7 +161,6 @@ class Asignacion:
                     msg += ": No puede asignar algo de tipo "+self.valor.tipo+" a una variable de tipo "+info[1]+"\n"
                     errorDeclaracion.append(msg)
             else:
-                self.valor.check(line) #Reviso primero que la expresión sea correcta
                 tipoOperador = self.valor.tipoExpresion()
                 if (tipoOperador != info[1]):
                     msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
