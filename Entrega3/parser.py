@@ -943,7 +943,7 @@ def p_inst(p):
         if (p[1]=='{'):
             p[0] = Bloque(None,p[2])
         else:
-            p[0] = Asignacion(Simple('id',p[1],p.lineno(1),find_column2(p.lexer.lexdata,p,1)),p[3],p.lineno(3),find_column2(p.lexer.lexdata,p,3))
+            p[0] = Asignacion(Simple('id',p[1],p.lineno(1),find_column2(p.lexer.lexdata,p,1)),p[3],p.lineno(1),find_column2(p.lexer.lexdata,p,1))
     elif (len(p)==5):
         if (p[1]=='{'):
             p[0] = Bloque(p[2],p[3])
