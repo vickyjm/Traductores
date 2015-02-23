@@ -221,7 +221,7 @@ if __name__ == '__main__':
         out = parser.parse(data)
         if not(parser_error):
             arbol = out.toString(0)
-            out.check(find_row(archivo)-1)
+            out.check(find_row(archivo))
             if (len(errorDeclaracion)!=0):
                 i = 0
                 while (i < len(errorDeclaracion)):
