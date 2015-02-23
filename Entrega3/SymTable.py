@@ -50,16 +50,4 @@ class Tabla:
 	def getFather(self):
 		return self.padre
 
-	def isValue(self,tipo):
-		claves = self.dic.keys()
-		for i in claves:
-			if (self.dic[i][1]==tipo):
-				return True
-		return False
 
-	def obtainKey(self,tipo):
-		claves = self.dic.keys()
-		for i in claves:
-			if (self.dic[i][1]==tipo):
-				return i
-		return None
