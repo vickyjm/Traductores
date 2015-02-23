@@ -302,7 +302,7 @@ class Opbin:
         self.izq = izq
         self.op = op
         self.der = der
-        self.opMixtos = set(['<+>','<->','<*>','</>','@'])
+        self.opMixtos = set(['<+>','<->','<*>','</>','<%>','@'])
         self.tipoOperandos = {
             '+'     : 'int',
             '-'     : 'int',
