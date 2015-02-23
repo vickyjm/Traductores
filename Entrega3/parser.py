@@ -263,7 +263,7 @@ class While:
         self.inst.check(line)
 
     def printSymTable(self,tabs):
-        return self.inst1.printSymTable(tabs)
+        return self.inst.printSymTable(tabs)
 
 class EntradaSalida:
     def __init__(self,flag,exp):
