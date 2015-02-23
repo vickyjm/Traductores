@@ -60,7 +60,7 @@ class Bloque:
             string += ' '*tabs + 'END_SCOPE\n'
             return string
         if (self.exp != None):
-            self.exp.printSymTable(tabs)
+            return self.exp.printSymTable(tabs)
 
 class Declarar:
     def __init__(self,lista):
@@ -640,8 +640,6 @@ class ListaInstruccion:
 
     def printSymTable(self,tabs):
         string = self.inst1.printSymTable(tabs)
-        print("Buenas")
-        print(self.inst2)
         if (self.inst2 != None):
             string += self.inst2.printSymTable(tabs)
         return string
@@ -955,8 +953,6 @@ def p_inst(p):
             p[0] = While(p[2],p[4],p.lineno(1),find_column2(p.lexer.lexdata,p,1))
 
     elif (len(p)==6):
-        print("Noches")
-        print(p[3])
         p[0] = Condicional(p[3],p[5],None,p.lineno(1),find_column2(p.lexer.lexdata,p,1))
 
     elif (len(p)==7):
