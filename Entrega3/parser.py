@@ -154,22 +154,27 @@ class Asignacion:
         else:
             self.valor.check(line) # Reviso primero que la expresión sea correcta
             info = TS.lookup(self.var.valor)
-            if (isinstance(self.valor,Simple)):
-                infoAsig = TS.lookup(self.valor.valor)
-                if (self.valor.tipo == 'id') and (infoAsig != None) and (infoAsig[1] != info[1]):
-                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                    msg += ": No puede asignar algo de tipo "+infoAsig[1]+" a una variable de tipo "+info[1]+"\n"
-                    errorDeclaracion.append(msg)
-                elif (self.valor.tipo != 'id') and (self.valor.tipo != info[1]):
-                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                    msg += ": No puede asignar algo de tipo "+self.valor.tipo+" a una variable de tipo "+info[1]+"\n"
-                    errorDeclaracion.append(msg)
+            if (info[1] == 'iter'):
+                msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                msg += ": No puede modificar la variable "+str(self.var.valor)+" ya que es el iterador de una instrucción For\n"
+                errorDeclaracion.append(msg)    
             else:
-                tipoOperador = self.valor.tipoExpresion()
-                if (tipoOperador != info[1]):
-                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                    msg += ": No puede asignar algo de tipo "+tipoOperador+"a una variable de tipo "+info[1]+"\n"
-                    errorDeclaracion.append(msg)
+                if (isinstance(self.valor,Simple)):
+                    infoAsig = TS.lookup(self.valor.valor)
+                    if (self.valor.tipo == 'id') and (infoAsig != None) and (infoAsig[1] != info[1]):
+                        msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                        msg += ": No puede asignar algo de tipo "+infoAsig[1]+" a una variable de tipo "+info[1]+"\n"
+                        errorDeclaracion.append(msg)
+                    elif (self.valor.tipo != 'id') and (self.valor.tipo != info[1]):
+                        msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                        msg += ": No puede asignar algo de tipo "+self.valor.tipo+" a una variable de tipo "+info[1]+"\n"
+                        errorDeclaracion.append(msg)
+                else:
+                    tipoOperador = self.valor.tipoExpresion()
+                    if (tipoOperador != info[1]):
+                        msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                        msg += ": No puede asignar algo de tipo "+tipoOperador+"a una variable de tipo "+info[1]+"\n"
+                        errorDeclaracion.append(msg)
 
     def printSymTable(self,tabs):
         return ''
@@ -198,7 +203,7 @@ class For:
         global errorDeclaracion
         global TS
         TS = Tabla(TS)
-        TS.insert(self.id1.valor,0,'int')
+        TS.insert(self.id1.valor,0,'iter') #Tipo especial para la variable de iteración del For
         self.exp.check(line)
         if (isinstance(self.exp,Simple)):
             valores = TS.lookup(self.exp.valor)
@@ -752,18 +757,18 @@ class ListaNumero:
         global errorDeclaracion
         if (isinstance(num,Simple)): 
             if ((self.num.tipo == 'bool') or (self.num.tipo == 'set')):
-                msg = "Error en linea "+ str(self.linea - line)+ ", columna " + str(self.colum) #ESTO HAY QUE CAMBIARLO
+                msg = "Error en linea "+ str(self.linea - line)+ ", columna " + str(self.colum) 
                 msg += ": Los conjuntos solo aceptan elementos de tipo 'int' no de tipo "+ self.num.tipo + '\n'
                 errorDeclaracion.append(msg)
             elif (num.tipo == 'id'): # Chequear si corresponde a un entero
                 tipo = TS.lookup(self.num.valor)
                 if (tipo != None): #Existe en alguna tabla
                     if (tipo[1] != 'int'):
-                        msg = "Error en linea "+ str(self.linea - line) + ", columna " + str(self.colum) #ESTO HAY QUE CAMBIARLO
+                        msg = "Error en linea "+ str(self.linea - line) + ", columna " + str(self.colum) 
                         msg += ": Los conjuntos solo aceptan elementos de tipo 'int' no de tipo "+ tipo[1] + '\n'
                         errorDeclaracion.append(msg)
                 else:
-                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum) #ESTO HAY QUE CAMBIARLO
+                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum) 
                     msg += ": La variable "+self.num.valor+" no ha sido declarada\n"
                     errorDeclaracion.append(msg)
 
@@ -1023,7 +1028,6 @@ def find_row(input):
 
 def find_row2(input):
     row = input.count('\n')
-    print row
     return row  
 
 # Permite encontrar el numero de columna de la linea actual
