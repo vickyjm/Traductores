@@ -143,7 +143,11 @@ class Asignacion:
     def check(self,line):
         global errorDeclaracion
         global TS
-        if not(TS.contains(self.var.valor)):
+        if (TS==None):
+            msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+            msg += ": La variable "+str(self.var.valor)+" no ha sido declarada\n"
+            errorDeclaracion.append(msg)
+        elif not(TS.contains(self.var.valor)):
             msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
             msg += ": La variable "+str(self.var.valor)+" no ha sido declarada\n"
             errorDeclaracion.append(msg)
