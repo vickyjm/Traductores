@@ -1023,7 +1023,6 @@ def find_row(input):
 
 def find_row2(input):
     row = input.count('\n')
-    print row
     return row  
 
 # Permite encontrar el numero de columna de la linea actual
