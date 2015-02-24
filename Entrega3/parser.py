@@ -1000,7 +1000,7 @@ def p_error(p):
     global parser_error
     if (p is not None):
         msg = "Error de sintaxis. Se encontró token " + str(p.value) + " en la linea "
-        msg += str(find_row2(p.lexer.lexdata,p)) + ", columna " + str(find_column(p.lexer.lexdata,p))
+        msg += str(p.lineno) + ", columna " + str(find_column(p.lexer.lexdata,p))
     else:
         msg = "Error de sintaxis al final del archivo"
     print msg
