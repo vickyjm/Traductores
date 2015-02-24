@@ -504,7 +504,7 @@ class Simple:
         global errorDeclaracion
         global TS
         if (self.tipo == 'id') and (TS.contains(self.valor) == None):
-            msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.column)
+            msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
             msg += ": La variable "+self.valor+" no ha sido declarada\n"
             errorDeclaracion.append(msg)
 
@@ -1019,6 +1019,7 @@ def find_row(input):
 
 def find_row2(input):
     row = input.count('\n')
+    print row
     return row  
 
 # Permite encontrar el numero de columna de la linea actual
