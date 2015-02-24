@@ -1000,7 +1000,7 @@ def p_error(p):
     global parser_error
     if (p is not None):
         msg = "Error de sintaxis. Se encontró token " + str(p.value) + " en la linea "
-        msg += str(p.lineno) + ", columna " + str(find_column(p.lexer.lexdata,p))
+        msg += str(p.lineno - find_row2(p.lexer.lexdata)) + ", columna " + str(find_column(p.lexer.lexdata,p))
     else:
         msg = "Error de sintaxis al final del archivo"
     print msg
@@ -1017,12 +1017,9 @@ def find_row(input):
             nro_linea += 1
     return nro_linea
 
-def find_row2(input,token):
-    last_cr = input.rfind('\n',0,token.lineno)
-    if last_cr < 0:
-        last_cr = -1
-    row = token.lineno - last_cr
-    return row + 1 
+def find_row2(input):
+    row = input.count('\n')
+    return row  
 
 # Permite encontrar el numero de columna de la linea actual
 def find_column(input,token):
