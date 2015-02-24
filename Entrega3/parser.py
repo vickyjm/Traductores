@@ -653,10 +653,12 @@ class ListaInstruccion:
         return string
 
 class ListaDeclaracion:
-    def __init__(self, tipo, idList, decList):
+    def __init__(self, tipo, idList, decList,linea,columna):
         self.tipo = tipo
         self.idList = idList
         self.decList = decList
+        self.linea = linea
+        self.colum = columna
 
     def toString(self,tabs):
         string = ' '*tabs + self.tipo + '\n'
@@ -675,7 +677,7 @@ class ListaDeclaracion:
         }
         lista = self.idList
         if (TS.isInTable(lista.id1.valor)):
-                msg = "Error en linea "+ lista.id1.getLinea() + ", columna " + lista.id1.getColumna()
+                msg = "Error en linea "+ str(self.linea - line) + ", columna " + str(self.colum)
                 msg += ": La variable "+ lista.id1.valor +" ya se encuentra declarada en este alcance\n"
                 errorDeclaracion.append(msg)
         else:
@@ -684,7 +686,7 @@ class ListaDeclaracion:
         if (isinstance(lista.idList,ListaID)):
             while (lista.idList != None):
                 if (TS.isInTable(lista.idList.id1.valor)):
-                    msg = "Error en linea "+ lista.idList.getLinea() + ", columna " + lista.idList.getColumna()
+                    msg = "Error en linea "+ str(self.linea - line) + ", columna " + str(self.colum)                    
                     msg += ": La variable "+ lista.idList.id1.valor +" ya se encuentra declarada en este alcance\n"
                     errorDeclaracion.append(msg)
                 else:
@@ -732,9 +734,11 @@ class ListaID:
         return ''
 
 class ListaNumero:
-    def __init__(self,numList,num):
+    def __init__(self,numList,num,linea,columna):
         self.numList = numList
         self.num = num
+        self.linea = linea
+        self.colum = columna
 
     def toString(self,tabs):
         string = ''
@@ -748,18 +752,18 @@ class ListaNumero:
         global errorDeclaracion
         if (isinstance(num,Simple)): 
             if ((self.num.tipo == 'bool') or (self.num.tipo == 'set')):
-                msg = "Error en linea "+ self.num.getLinea() + ", columna " + self.num.getColumna() #ESTO HAY QUE CAMBIARLO
+                msg = "Error en linea "+ str(self.linea - line)+ ", columna " + str(self.colum) #ESTO HAY QUE CAMBIARLO
                 msg += ": Los conjuntos solo aceptan elementos de tipo 'int' no de tipo "+ self.num.tipo + '\n'
                 errorDeclaracion.append(msg)
             elif (num.tipo == 'id'): # Chequear si corresponde a un entero
                 tipo = TS.lookup(self.num.valor)
                 if (tipo != None): #Existe en alguna tabla
                     if (tipo[1] != 'int'):
-                        msg = "Error en linea "+ self.num.getLinea() + ", columna " + self.num.getColumna() #ESTO HAY QUE CAMBIARLO
+                        msg = "Error en linea "+ str(self.linea - line) + ", columna " + str(self.colum) #ESTO HAY QUE CAMBIARLO
                         msg += ": Los conjuntos solo aceptan elementos de tipo 'int' no de tipo "+ tipo[1] + '\n'
                         errorDeclaracion.append(msg)
                 else:
-                    msg = "Error en la linea "+self.num.getLinea()+", columna "+self.num.getColumna() #ESTO HAY QUE CAMBIARLO
+                    msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum) #ESTO HAY QUE CAMBIARLO
                     msg += ": La variable "+self.num.valor+" no ha sido declarada\n"
                     errorDeclaracion.append(msg)
 
@@ -858,9 +862,9 @@ def p_decList(p):
                   | TIPOS ID_LIST Semicolon '''
 
     if (len(p)==4):
-        p[0] = ListaDeclaracion(p[1],p[2],None)
+        p[0] = ListaDeclaracion(p[1],p[2],None,p.lineno(1),find_column2(p.lexer.lexdata,p,1))
     else:
-        p[0] = ListaDeclaracion(p[1],p[2],p[4])
+        p[0] = ListaDeclaracion(p[1],p[2],p[4],p.lineno(1),find_column2(p.lexer.lexdata,p,1))
 
 
 def p_instList(p):
@@ -994,7 +998,7 @@ def p_numberList(p):
     if (len(p)==2):
         p[0] = p[1]
     else:
-        p[0] = ListaNumero(p[1],p[3])
+        p[0] = ListaNumero(p[1],p[3],p.lineno(1),find_column2(p.lexer.lexdata,p,1))
 
 def p_error(p):
     global parser_error
