@@ -434,7 +434,7 @@ class Opbin:
             valores = TS.lookup(self.izq.valor)
             if (valores != None) and (valores[1] == 'iter'):
                 valores[1]  = 'int'
-            if (self.izq.tipo == 'id') and (valores[1] != None):
+            if (valores != None) and (self.izq.tipo == 'id') and (valores[1] != None):
                 if (self.op in self.opMixtos):
                     if (valores[1] != 'int'):
                         msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
@@ -468,7 +468,7 @@ class Opbin:
             valores = TS.lookup(self.der.valor)
             if (valores != None) and (valores[1] == 'iter'):
                 valores[1]  = 'int'
-            if (self.der.tipo == 'id') and (valores[1] != None):
+            if (valores != None) and (self.der.tipo == 'id') and (valores[1] != None):
                 if (self.op in self.opMixtos):
                     if (valores[1] != 'set'):
                         msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
@@ -888,9 +888,9 @@ def p_decList(p):
                   | TIPOS ID_LIST Semicolon '''
 
     if (len(p)==4):
-        p[0] = ListaDeclaracion(p[1],p[2],None,p.lineno(1),find_column2(p.lexer.lexdata,p,1))
+        p[0] = ListaDeclaracion(p[1],p[2],None,p.lineno(3),find_column2(p.lexer.lexdata,p,3)-4)
     else:
-        p[0] = ListaDeclaracion(p[1],p[2],p[4],p.lineno(1),find_column2(p.lexer.lexdata,p,1))
+        p[0] = ListaDeclaracion(p[1],p[2],p[4],p.lineno(3),find_column2(p.lexer.lexdata,p,3)-4)
 
 
 def p_instList(p):
@@ -967,7 +967,7 @@ def p_exp(p):
         elif (p[1]=='{'):
             p[0] = Simple('set',p[2],p.lineno(1),find_column2(p.lexer.lexdata,p,1))
         else:
-            p[0] = Opbin(p[1],p[2],p[3],p.lineno(2),find_column2(p.lexer.lexdata,p,1))
+            p[0] = Opbin(p[1],p[2],p[3],p.lineno(2),find_column2(p.lexer.lexdata,p,2))
 
 
 def p_inst(p):
@@ -985,7 +985,7 @@ def p_inst(p):
             | WHILE EXP DO INST'''
     if (len(p)==3):
         if (p[1]=='scan'):
-            p[0] = EntradaSalida(p[1],Simple('id',p[2],p.lineno(1),find_column2(p.lexer.lexdata,p,1)))
+            p[0] = EntradaSalida(p[1],Simple('id',p[2],p.lineno(2),find_column2(p.lexer.lexdata,p,2)))
         else:
             p[0] = EntradaSalida(p[1],p[2])
 
@@ -1009,7 +1009,7 @@ def p_inst(p):
         if (p[1]=='for'):
             p[0] = For(Simple('int',p[2],p.lineno(1),find_column2(p.lexer.lexdata,p,1)),p[3],p[4],p[6],p.lineno(1),find_column2(p.lexer.lexdata,p,1))
         else:
-            p[0] = Repeat(p[2],p[4],p[6],p.lineno(1),find_column2(p.lexer.lexdata,p,1))
+            p[0] = Repeat(p[2],p[4],p[6],p.lineno(3),find_column2(p.lexer.lexdata,p,3))
     else:
         p[0] = Condicional(p[3],p[5],p[7],p.lineno(1),find_column2(p.lexer.lexdata,p,1))
 
