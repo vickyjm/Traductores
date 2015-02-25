@@ -5,7 +5,7 @@ program {
     bool e, f; # inicializan en {}
   in
 
-  a = 1;
+  a = h;
   scan b;
   c = {1,2,3};
   d = {2,3,4};
