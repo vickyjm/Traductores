@@ -300,7 +300,7 @@ class EntradaSalida:
         global errorDeclaracion
         global TS
         if (self.flag == 'scan'):
-            valores = TS.lookup(self.exp)
+            valores = TS.lookup(self.exp.valor)
             if (valores != None):
                 if (valores[1] == 'set'):
                     msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
@@ -310,7 +310,6 @@ class EntradaSalida:
                     msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                     msg += ": No puede modificar la variable "+str(self.var.valor)+" ya que es el iterador de una instrucción For\n"
                     errorDeclaracion.append(msg)  
-
         self.exp.check(line)
 
     def printSymTable(self,tabs):
@@ -444,12 +443,12 @@ class Opbin:
                     msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                     msg += ": El operador "+self.op+" solo acepta expresiones de tipo '"+tipoOperandos+"' no "+valores[1]+"\n"
                     errorDeclaracion.append(msg)
-            elif (self.op in self.opMixtos) :
-                if (self.izq.tipo != 'int'):
+            elif (self.op in self.opMixtos):
+                if (self.izq.tipo != 'int') and (self.izq.tipo!='id'):
                     msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                     msg += ": El operador "+self.op+" espera una expresion de tipo int no " + self.izq.tipo + "\n"
                     errorDeclaracion.append(msg)
-            elif (self.izq.tipo != tipoOperandos) and not(esOpEspecial):
+            elif (self.izq.tipo!='id') and (self.izq.tipo != tipoOperandos) and not(esOpEspecial):
                 msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                 msg += ": El operador "+self.op+" solo acepta expresiones de tipo '"+tipoOperandos+"' no "+self.izq.tipo+"\n"
                 errorDeclaracion.append(msg)
@@ -557,24 +556,23 @@ class Repeat:
         global errorDeclaracion
         global TS
         self.inst1.check(line)
+        self.exp.check(line)
         if (isinstance(self.exp,Simple)):
             valores = TS.lookup(self.exp.valor)
             if (valores != None) and (valores[1] == 'iter'):
                 valores[1]  = 'int'
             if (self.exp.tipo == 'id') and (valores != None) and (valores[1]!='bool'):
                 msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                msg += ": Solo acepta expresiones de tipo 'bool' no"+valores[1]+"\n"
+                msg += ": Solo acepta expresiones de tipo 'bool' no "+valores[1]+"\n"
                 errorDeclaracion.append(msg)
             elif ((self.exp.tipo == 'set') or (self.exp.tipo == 'int')):
                 msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                msg += ": Solo acepta expresiones de tipo 'bool' no"+self.exp.tipoExpresion()+"\n"
+                msg += ": Solo acepta expresiones de tipo 'bool' no "+self.exp.tipoExpresion()+"\n"
                 errorDeclaracion.append(msg)
         else:
-            if (self.exp.tipoExpresion() == 'bool'):
-                self.exp.check(line)
-            else:
+            if (self.exp.tipoExpresion() != 'bool'):
                 msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                msg += ": Solo acepta expresiones de tipo 'bool' no"+self.exp.tipoExpresion()+"\n"
+                msg += ": Solo acepta expresiones de tipo 'bool' no "+self.exp.tipoExpresion()+"\n"
                 errorDeclaracion.append(msg)
         if (self.inst2 != None):
             self.inst2.check(line)
@@ -591,13 +589,20 @@ class Uniop:
         self.op = op
         self.linea = linea
         self.colum = columna
+        self.tipoOperandos = {
+            '-'     :   'int',
+            '<?'    :   'set',
+            '>?'    :   'set',
+            '$?'    :   'set',
+            'not'   :   'bool'
+        }
 
     def tipoExpresion(self):
         operadores = {
             '-'     : 'int',
-            '<?'    : 'set',
-            '>?'    : 'set',
-            '$?'    : 'set',
+            '<?'    : 'int',
+            '>?'    : 'int',
+            '$?'    : 'int',
             'not'   : 'bool'
         }
         return operadores.get(self.op)
@@ -617,23 +622,23 @@ class Uniop:
     def check(self,line):
         global errorDeclaracion
         global TS
-        tipoOperador = self.tipoExpresion()
+        tipoOperandos = self.tipoOperandos.get(self.op)
         if (isinstance(self.val,Simple)):
             valores = TS.lookup(self.val.valor)
             if (valores != None) and (valores[1] == 'iter'):
                 valores[1] = 'int'
-            if (self.val.tipo == 'id') and (valores != None) and (valores[1] != tipoOperador):
+            if (self.val.tipo == 'id') and (valores != None) and (valores[1] != tipoOperandos):
                 msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                msg += ": "+self.op+" solo acepta expresiones de tipo '"+tipoOperador+"' no "+valores[1]+"\n"
+                msg += ": "+self.op+" solo acepta expresiones de tipo '"+tipoOperandos+"' no "+valores[1]+"\n"
                 errorDeclaracion.append(msg)
-            elif (self.val.tipo != tipoOperador) and (self.val.tipo != 'id'):
+            elif (self.val.tipo != tipoOperandos) and (self.val.tipo != 'id'):
                 msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                msg += ": "+self.op+" solo acepta expresiones de tipo '"+tipoOperador+"' no "+self.val.tipo+"\n"
+                msg += ": "+self.op+" solo acepta expresiones de tipo '"+tipoOperandos+"' no "+self.val.tipo+"\n"
                 errorDeclaracion.append(msg)
         else:
-            if (self.val.tipoExpresion() != tipoOperador):
+            if (self.val.tipoExpresion() != tipoOperandos):
                 msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                msg += ": "+self.op+" solo acepta expresiones de tipo '"+tipoOperador+"' no "+self.val.tipoExpresion()+"\n"
+                msg += ": "+self.op+" solo acepta expresiones de tipo '"+tipoOperandos+"' no "+self.val.tipoExpresion()+"\n"
                 errorDeclaracion.append(msg)
         self.val.check(line)
 
@@ -668,9 +673,11 @@ class ListaInstruccion:
         return string
 
     def check(self,line):
+        global TS
         self.inst1.check(line)
         if (self.inst2 != None):
             self.inst2.check(line)
+        
 
     def printSymTable(self,tabs):
         string = self.inst1.printSymTable(tabs)
