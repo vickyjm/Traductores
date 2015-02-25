@@ -1,0 +1,28 @@
+program {
+    using 
+        int y;
+    in
+    for i min {1,2,3} do {
+        using 
+            set w;
+        in
+        {
+            using 
+                bool x;
+            in
+            x = true;
+            {
+                using int y;
+                in
+                y = i + 1 * i % (i+2) and 4;
+            };
+
+        };
+    };
+    {
+        using int i;
+        in
+        print i;
+
+    };
+}
