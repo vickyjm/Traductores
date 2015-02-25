@@ -25,12 +25,6 @@ Aclaratorias:
 	-> Corregimos la precedencia de los operadores.
 	-> Agregamos la verificación de entero de 32 bits en el lexer.
 	-> Ya acepta conjuntos vacíos.
-	-> Si hay errores lexicógraficos los imprime todos y no continúa con la acción indicada en 
-	   los flags de entrada, debido a que el analizador sintáctico y la tabla de símbolos dependen
-	   del análisis lexicográfico.
-	-> Si hay errores sintácticos, solo detecta el primero, lo imprime por salida estándar y
-	   culmina el programa. Si dentro de los flags ingresados se encuentra el de la tabla de símbolos
-       este no se ejecuta porque depende del analizador sintáctico.
 	-> En caso que no existan errores lexicogŕaficos ni sintácticos, se imprimirá por salida estándar
 	   los datos correspondientes a los flags ingresados con consola.
 	-> Separamos todo lo referente al parser en un archivo aparte llamado parser.py para mejorar el entendimiento
