@@ -322,7 +322,7 @@ class EntradaSalida:
                     errorDeclaracion.append(msg)
                 elif (valores[1] == 'iter'):
                     msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                    msg += ": No puede modificar la variable "+str(self.var.valor)+" ya que es el iterador de una instrucción For\n"
+                    msg += ": No puede modificar la variable "+str(self.exp.valor)+" ya que es el iterador de una instrucción For\n"
                     errorDeclaracion.append(msg)  
         self.exp.check(line)
 
@@ -1018,9 +1018,9 @@ def p_inst(p):
             | WHILE EXP DO INST'''
     if (len(p)==3):
         if (p[1]=='scan'):
-            p[0] = EntradaSalida(p[1],Simple('id',p[2],p.lineno(2),find_column2(p.lexer.lexdata,p,2)))
+            p[0] = EntradaSalida(p[1],Simple('id',p[2],p.lineno(2),find_column2(p.lexer.lexdata,p,2)),p.lineno(1),find_column2(p.lexer.lexdata,p,2))
         else:
-            p[0] = EntradaSalida(p[1],p[2])
+            p[0] = EntradaSalida(p[1],p[2],p.lineno(1),find_column2(p.lexer.lexdata,p,2))
 
     elif (len(p)==4):
         if (p[1]=='{'):
