@@ -766,8 +766,8 @@ class ListaDeclaracion:
         string += ' | Value: ' + str(valDefecto.get(self.tipo)) + '\n'
         if (isinstance(lista.idList,ListaID)):
             while (lista.idList != None):
-                string += ' '*tabs + 'Variable: ' + lista.idList.id1.valor + ' | Type: ' + self.tipo
-                string += ' | Value: ' + str(valDefecto.get(self.tipo)) + '\n'
+                string = ' | Value: ' + str(valDefecto.get(self.tipo)) + '\n' + string
+                string = ' '*tabs + 'Variable: ' + lista.idList.id1.valor + ' | Type: ' + self.tipo + string
                 lista = lista.idList
 
         if (isinstance(self.decList,ListaDeclaracion)):
