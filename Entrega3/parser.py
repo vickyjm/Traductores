@@ -104,11 +104,14 @@ class Condicional:
         self.cond.check(line)
         if (isinstance(self.cond,Simple)):
             valores = TS.lookup(self.cond.valor)
-            if (valores != None) and (valores[1] == 'iter'):
-                valores[1] = 'int'
-            if (self.cond.tipo == 'id') and (valores != None) and (valores[1] != 'bool'):
+            if (valores != None): 
+                if (valores[1] == 'iter'):
+                    auxTipo  = 'int'
+                else:
+                    auxTipo = valores[1]
+            if (self.cond.tipo == 'id') and (valores != None) and (auxTipo != 'bool'):
                 msg = "Error en linea "+str(self.linea - line) + ", columna " + str(self.colum)
-                msg += ": Instruccion 'if' espera expresiones de tipo bool y no "+ valores[1] + "\n"
+                msg += ": Instruccion 'if' espera expresiones de tipo bool y no "+ auxTipo + "\n"
                 errorDeclaracion.append(msg)    
             elif ((self.cond.tipo == 'int') or (self.cond.tipo == 'set')):
                 msg = "Error en linea "+str(self.linea - line) + ", columna " + str(self.colum)
@@ -154,8 +157,8 @@ class Asignacion:
             msg += ": La variable "+str(self.var.valor)+" no ha sido declarada\n"
             errorDeclaracion.append(msg)
         else:
-            self.valor.check(line) # Reviso primero que la expresión sea correcta
             info = TS.lookup(self.var.valor)
+            self.valor.check(line) # Reviso primero que la expresión sea correcta
             if (info[1] == 'iter'):
                 msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                 msg += ": No puede modificar la variable "+str(self.var.valor)+" ya que es el iterador de una instrucción For\n"
@@ -163,11 +166,14 @@ class Asignacion:
             else:
                 if (isinstance(self.valor,Simple)):
                     infoAsig = TS.lookup(self.valor.valor)
-                    if (infoAsig != None) and (infoAsig[1] == 'iter'):
-                        infoAsig[1] = 'int'
-                    if (self.valor.tipo == 'id') and (infoAsig != None) and (infoAsig[1] != info[1]):
+                    if (infoAsig != None): 
+                        if (infoAsig[1] == 'iter'):
+                            auxTipo  = 'int'
+                        else:
+                            auxTipo = infoAsig[1]
+                    if (self.valor.tipo == 'id') and (infoAsig != None) and (auxTipo != info[1]):
                         msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                        msg += ": No puede asignar algo de tipo "+infoAsig[1]+" a una variable de tipo "+info[1]+"\n"
+                        msg += ": No puede asignar algo de tipo "+auxTipo+" a una variable de tipo "+info[1]+"\n"
                         errorDeclaracion.append(msg)
                     elif (self.valor.tipo != 'id') and (self.valor.tipo != info[1]):
                         msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
@@ -211,11 +217,14 @@ class For:
         self.exp.check(line)
         if (isinstance(self.exp,Simple)):
             valores = TS.lookup(self.exp.valor)
-            if (valores != None) and (valores[1] == 'iter'):
-                valores[1] = 'int'
-            if (self.exp.tipo == 'id') and (valores != None) and (valores[1] != 'set'):
+            if (valores != None): 
+                if (valores[1] == 'iter'):
+                    auxTipo  = 'int'
+                else:
+                    auxTipo = valores[1]
+            if (self.exp.tipo == 'id') and (valores != None) and (auxTipo != 'set'):
                 msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                msg += ": Solo acepta expresiones de tipo 'set' no "+valores[1]+"\n"
+                msg += ": Solo acepta expresiones de tipo 'set' no "+auxTipo+"\n"
                 errorDeclaracion.append(msg)
 
             elif ((self.exp.tipo == 'bool') or (self.exp.tipo == 'int')):
@@ -259,11 +268,14 @@ class While:
         self.exp.check(line)
         if (isinstance(self.exp,Simple)): 
             valores = TS.lookup(self.exp.valor)
-            if (valores != None) and (valores[1] == 'iter'):
-                valores[1] = 'int'
-            if (self.exp.tipo == 'id') and (valores != None) and (valores[1] != 'bool'):
+            if (valores != None): 
+                if (valores[1] == 'iter'):
+                    auxTipo  = 'int'
+                else:
+                    auxTipo = valores[1]
+            if (self.exp.tipo == 'id') and (valores != None) and (auxTipo != 'bool'):
                 msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                msg += ": Solo acepta expresiones de tipo 'bool' no"+valores[1]+"\n"
+                msg += ": Solo acepta expresiones de tipo 'bool' no"+auxTipo+"\n"
                 errorDeclaracion.append(msg)
             elif ((self.exp.tipo == 'int') or (self.exp.tipo == 'set')):
                 msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
@@ -280,9 +292,11 @@ class While:
         return self.inst.printSymTable(tabs)
 
 class EntradaSalida:
-    def __init__(self,flag,exp):
+    def __init__(self,flag,exp,linea,columna):
         self.flag = flag
         self.exp = exp
+        self.linea = linea
+        self.colum = columna
 
     def toString(self,tabs):
         string = ' '*tabs + self.flag.upper() + '\n'
@@ -431,17 +445,20 @@ class Opbin:
 
         if (isinstance(self.izq,Simple)):
             valores = TS.lookup(self.izq.valor)
-            if (valores != None) and (valores[1] == 'iter'):
-                valores[1]  = 'int'
-            if (valores != None) and (self.izq.tipo == 'id') and (valores[1] != None):
+            if (valores != None): 
+                if (valores[1] == 'iter'):
+                    auxTipo  = 'int'
+                else:
+                    auxTipo = valores[1]
+            if (valores != None) and (self.izq.tipo == 'id') and (auxTipo != None):
                 if (self.op in self.opMixtos):
-                    if (valores[1] != 'int'):
+                    if (auxTipo != 'int'):
                         msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                        msg += ": El operador "+self.op+" espera una expresion de tipo int no " + valores[1] + "\n"
+                        msg += ": El operador "+self.op+" espera una expresion de tipo int no " + auxTipo + "\n"
                         errorDeclaracion.append(msg)    
-                elif (valores[1] != tipoOperandos) and not(esOpEspecial):
+                elif (auxTipo != tipoOperandos) and not(esOpEspecial):
                     msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                    msg += ": El operador "+self.op+" solo acepta expresiones de tipo '"+tipoOperandos+"' no "+valores[1]+"\n"
+                    msg += ": El operador "+self.op+" solo acepta expresiones de tipo '"+tipoOperandos+"' no "+auxTipo+"\n"
                     errorDeclaracion.append(msg)
             elif (self.op in self.opMixtos):
                 if (self.izq.tipo != 'int') and (self.izq.tipo!='id'):
@@ -465,17 +482,20 @@ class Opbin:
 
         if (isinstance(self.der,Simple)):
             valores = TS.lookup(self.der.valor)
-            if (valores != None) and (valores[1] == 'iter'):
-                valores[1]  = 'int'
-            if (valores != None) and (self.der.tipo == 'id') and (valores[1] != None):
+            if (valores != None): 
+                if (valores[1] == 'iter'):
+                    auxTipo  = 'int'
+                else:
+                    auxTipo = valores[1]
+            if (valores != None) and (self.der.tipo == 'id') and (auxTipo != None):
                 if (self.op in self.opMixtos):
-                    if (valores[1] != 'set'):
+                    if (auxTipo != 'set'):
                         msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                        msg += ": El operador "+self.op+" espera una expresion de tipo set no " + valores[1] + "\n"
+                        msg += ": El operador "+self.op+" espera una expresion de tipo set no " + auxTipo + "\n"
                         errorDeclaracion.append(msg)    
-                elif (valores[1] != tipoOperandos) and not(esOpEspecial):
+                elif (auxTipo != tipoOperandos) and not(esOpEspecial):
                     msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                    msg += ": El operador "+self.op+" solo acepta expresiones de tipo '"+tipoOperandos+"' no "+valores[1]+"\n"
+                    msg += ": El operador "+self.op+" solo acepta expresiones de tipo '"+tipoOperandos+"' no "+auxTipo+"\n"
                     errorDeclaracion.append(msg)
             elif (self.op in self.opMixtos): 
                 if (self.der.tipo != 'set'):
@@ -559,11 +579,14 @@ class Repeat:
         self.exp.check(line)
         if (isinstance(self.exp,Simple)):
             valores = TS.lookup(self.exp.valor)
-            if (valores != None) and (valores[1] == 'iter'):
-                valores[1]  = 'int'
-            if (self.exp.tipo == 'id') and (valores != None) and (valores[1]!='bool'):
+            if (valores != None): 
+                if (valores[1] == 'iter'):
+                    auxTipo  = 'int'
+                else:
+                    auxTipo = valores[1]
+            if (self.exp.tipo == 'id') and (valores != None) and (auxTipo!='bool'):
                 msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                msg += ": Solo acepta expresiones de tipo 'bool' no "+valores[1]+"\n"
+                msg += ": Solo acepta expresiones de tipo 'bool' no "+auxTipo+"\n"
                 errorDeclaracion.append(msg)
             elif ((self.exp.tipo == 'set') or (self.exp.tipo == 'int')):
                 msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
@@ -625,11 +648,14 @@ class Uniop:
         tipoOperandos = self.tipoOperandos.get(self.op)
         if (isinstance(self.val,Simple)):
             valores = TS.lookup(self.val.valor)
-            if (valores != None) and (valores[1] == 'iter'):
-                valores[1] = 'int'
-            if (self.val.tipo == 'id') and (valores != None) and (valores[1] != tipoOperandos):
+            if (valores != None): 
+                if (valores[1] == 'iter'):
+                    auxTipo  = 'int'
+                else:
+                    auxTipo = valores[1]
+            if (self.val.tipo == 'id') and (valores != None) and (auxTipo != tipoOperandos):
                 msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
-                msg += ": "+self.op+" solo acepta expresiones de tipo '"+tipoOperandos+"' no "+valores[1]+"\n"
+                msg += ": "+self.op+" solo acepta expresiones de tipo '"+tipoOperandos+"' no "+auxTipo+"\n"
                 errorDeclaracion.append(msg)
             elif (self.val.tipo != tipoOperandos) and (self.val.tipo != 'id'):
                 msg = "Error en la linea "+str(self.linea - line)+", columna "+str(self.colum)
