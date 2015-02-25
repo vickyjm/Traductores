@@ -217,7 +217,7 @@ if __name__ == '__main__':
         out = parser.parse(data)
         if not(iserror()):
             arbol = out.toString(0)
-            out.check(find_row(archivo)-1)
+            out.check(find_row2(lexer.lexdata))
             if (len(errorDeclaracion)!=0):
                 i = 0
                 while (i < len(errorDeclaracion)):
