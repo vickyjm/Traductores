@@ -39,3 +39,4 @@ Aclaratorias:
     		* Errores de redeclaraciones de variables dentro de un mismo bloque using ... in.
     		* Utilización de variables no declaradas en ese alcance.
     		* Errores de tipos, como por ejemplo: Intentar sumar una variable del tipo int con una del tipo bool.
+    		* Modificación de variables de iteración.
