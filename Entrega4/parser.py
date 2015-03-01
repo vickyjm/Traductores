@@ -633,7 +633,7 @@ class Simple:
             elif (valores[1] == 'set'):
                 return set(valores[0])
         else:
-            return set(self.valor)
+            return set(self.valor.evaluate(line))
 
 
 class Repeat:
@@ -753,6 +753,33 @@ class Uniop:
 
     def printSymTable(self,tabs):
         return ''
+
+    def evaluate(self,line):
+        global TS
+        if (self.op == 'not'):
+            return not (self.val.evaluate(line))
+        elif (self.op == '$?'):
+            return len(self.val.evaluate(line))
+        elif (self.op == '-'):
+            res = self.val.evaluate(line)
+            res = -res
+            if ((res > 2147483647) or (res < -2147483648)):
+                print "ERROR: se produjo overflow en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                exit(0)
+            else:
+                return res
+        elif (self.op == '<?'):
+            if (len(self.val.evaluate(line)) == 0):
+                print "ERROR: conjunto vacío en la operación '<?' en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                exit(0)
+            else:
+                return min(self.val.evaluate(line))
+        else:
+            if (len(self.val.evaluate(line)) == 0):
+                print "ERROR: conjunto vacío en la operación '>?' en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                exit(0)
+            else:
+                return max(self.val.evaluate(line))
 
 
 class CadenaString:
@@ -951,6 +978,33 @@ class ListaNumero:
 
     def printSymTable(self,tabs):
         return ''
+
+    def evaluate(self,line):
+        global TS
+        conjunto = set()
+        if (self.num.tipo == 'id'):
+            valores = TS.lookup(self.num.valor)
+            aux = valores[0]
+            conjunto.add(aux)
+        else:
+            conjunto.add(self.num.evaluate(line))
+        lista = self.numList
+        while (isinstance(lista,ListaNumero)):
+            if (lista.num.tipo == 'id'):
+                valores = TS.lookup(lista.num.valor)
+                aux = valores[0]
+                conjunto.add(aux)
+            else:
+                conjunto.add(lista.num.valor)
+            lista = lista.numList
+        if (lista.tipo == 'id'):
+            valores = TS.lookup(lista.valor)
+            aux = valores[0]
+            conjunto.add(aux)
+        else:
+            conjunto.add(lista.valor)
+        return conjunto
+
 
 class ListaImpresion:
     def __init__(self,listExp,exp):
