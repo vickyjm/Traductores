@@ -276,7 +276,14 @@ class For:
         string += ' '*tabs + 'END_SCOPE\n'
         return string
 
+    def execute(self,line):
+        global TS
+        TS = Tabla(TS)
+        TS.insert(self.id1.valor,0,'iter') #Tipo especial para la variable de iteración del For
 
+        # AQUI TIENES QUE PONER LO QUE HACE QUE SE EJECUTE LA INSTRUCCION FOR
+
+        TS = TS.getFather()
 class While:
     def __init__(self,exp,inst,linea,columna):
         self.exp = exp
@@ -586,6 +593,118 @@ class Opbin:
     def printSymTable(self,tabs):
         return ''
 
+    def evaluate(self,line):
+        if (self.op == '+'):
+            res = self.izq.evaluate(line) + self.der.evaluate(line)
+            if ((res > 2147483647) or (res < -2147483648)):
+                print "ERROR: se produjo overflow en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                exit(0)
+        elif (self.op == '-'):
+            res = self.izq.evaluate(line) - self.der.evaluate(line)
+            if ((res > 2147483647) or (res < -2147483648)):
+                print "ERROR: se produjo overflow en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                exit(0)
+        elif (self.op == '*'):
+            res = self.izq.evaluate(line) * self.der.evaluate(line)
+            if ((res > 2147483647) or (res < -2147483648)):
+                print "ERROR: se produjo overflow en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                exit(0)
+        elif (self.op == '/'):
+            if (self.der.evaluate(line) == 0):
+                print "ERROR: división por cero en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                exit(0)
+            res = self.izq.evaluate(line) / self.der.evaluate(line)
+            if ((res > 2147483647) or (res < -2147483648)):
+                print "ERROR: se produjo overflow en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                exit(0)
+        elif (self.op == '%'):
+            if (self.der.evaluate(line) == 0):
+                print "ERROR: división por cero en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                exit(0)
+            res = self.izq.evaluate(line) % self.der.evaluate(line)
+            if ((res > 2147483647) or (res < -2147483648)):
+                print "ERROR: se produjo overflow en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                exit(0)
+        elif (self.op == '++'):
+            res = self.izq.evaluate(line)
+            res |= self.der.evaluate(line)
+        elif (self.op == '><'):
+            res = self.izq.evaluate(line)
+            res &= self.der.evaluate(line)
+        elif (self.op == '\\'):
+            res = self.izq.evaluate(line)
+            res -= self.der.evaluate(line)
+        elif (self.op == '<+>'):
+            aux = self.der.evaluate(line)
+            num = self.izq.evaluate(line)
+            res = set()
+            for elem in aux:
+                if ((num + elem > 2147483647) or (num + elem < -2147483648)):
+                    print "ERROR: se produjo overflow en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                    exit(0)
+                res.add(num + elem)
+        elif (self.op == '<->'):
+            aux = self.der.evaluate(line)
+            num = self.izq.evaluate(line)
+            res = set()
+            for elem in aux:
+                if ((num - elem > 2147483647) or (num - elem < -2147483648)):
+                    print "ERROR: se produjo overflow en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                    exit(0)
+                res.add(num - elem)
+        elif (self.op == '<*>'):
+            aux = self.der.evaluate(line)
+            num = self.izq.evaluate(line)
+            res = set()
+            for elem in aux:
+                if ((num * elem > 2147483647) or (num * elem < -2147483648)):
+                    print "ERROR: se produjo overflow en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                    exit(0)
+                res.add(num * elem)
+        elif (self.op == '</>'):
+            if (self.der.evaluate(line) == 0):
+                print "ERROR: división por cero en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                exit(0)
+            aux = self.der.evaluate(line)
+            num = self.izq.evaluate(line)
+            res = set()
+            for elem in aux:
+                if ((num / elem > 2147483647) or (num / elem < -2147483648)):
+                    print "ERROR: se produjo overflow en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                    exit(0)
+                res.add(num / elem)
+        elif (self.op == '<%>'):
+            if (self.der.evaluate(line) == 0):
+                print "ERROR: división por cero en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                exit(0)
+            aux = self.der.evaluate(line)
+            num = self.izq.evaluate(line)
+            res = set()
+            for elem in aux:
+                if ((num % elem > 2147483647) or (num % elem < -2147483648)):
+                    print "ERROR: se produjo overflow en la linea "+str(self.linea - line)+", columna "+str(self.colum)
+                    exit(0)
+                res.add(num % elem)
+        elif (self.op == '<'):
+            res = self.izq.evaluate(line) < self.der.evaluate(line)
+        elif (self.op == '<='):
+            res = self.izq.evaluate(line) <= self.der.evaluate(line)
+        elif (self.op == '>'):
+            res = self.izq.evaluate(line) > self.der.evaluate(line)
+        elif (self.op == '>='):
+            res = self.izq.evaluate(line) >= self.der.evaluate(line)
+        elif (self.op == '=='):
+            res = self.izq.evaluate(line) == self.der.evaluate(line)
+        elif (self.op == '/='):
+            res = self.izq.evaluate(line) != self.der.evaluate(line)
+        elif (self.op == '@'):
+            res = self.izq.evaluate(line) in self.der.evaluate(line)
+        elif (self.op == 'and'):
+            res = self.izq.evaluate(line) and self.der.evaluate(line)
+        elif (self.op == 'or'):
+            res = self.izq.evaluate(line) or self.der.evaluate(line)
+        return res
+
 
 class Simple:
     def __init__(self,tipo,valor,linea,columna):
@@ -626,14 +745,16 @@ class Simple:
             return (self.valor == 'true')
         elif (self.tipo == 'id'):
             valores = TS.lookup(self.valor)
-            if (valores[1] == 'int'):
+            if (valores[1] == 'int') or (valores[1] == 'iter'):
                 return valores[0]
             elif (valores[1] == 'bool'):
                 return (valores[0]=='true')
             elif (valores[1] == 'set'):
-                return set(valores[0])
+                return valores[0]
         else:
-            return set(self.valor.evaluate(line))
+            if (self.valor == None): # Caso de conjunto vacío
+                return set()
+            return self.valor.evaluate(line)
 
 
 class Repeat:
@@ -982,27 +1103,12 @@ class ListaNumero:
     def evaluate(self,line):
         global TS
         conjunto = set()
-        if (self.num.tipo == 'id'):
-            valores = TS.lookup(self.num.valor)
-            aux = valores[0]
-            conjunto.add(aux)
-        else:
-            conjunto.add(self.num.evaluate(line))
+        conjunto.add(self.num.evaluate(line))
         lista = self.numList
         while (isinstance(lista,ListaNumero)):
-            if (lista.num.tipo == 'id'):
-                valores = TS.lookup(lista.num.valor)
-                aux = valores[0]
-                conjunto.add(aux)
-            else:
-                conjunto.add(lista.num.valor)
+            conjunto.add(lista.num.evaluate(line))
             lista = lista.numList
-        if (lista.tipo == 'id'):
-            valores = TS.lookup(lista.valor)
-            aux = valores[0]
-            conjunto.add(aux)
-        else:
-            conjunto.add(lista.valor)
+        conjunto.add(lista.evaluate(line))
         return conjunto
 
 
@@ -1027,7 +1133,19 @@ class ListaImpresion:
 
     def evaluate(self,line):
         string = str(self.listExp.evaluate(line))
-        string += str(self.exp.evaluate(line))
+        aux = self.exp.evaluate(line)
+        if (isinstance(aux,set)):
+            setTmp = list(aux)
+            setTmp.sort()
+            if (setTmp == []):
+                string += '{}'
+            else:
+                string += '{'
+                for elem in range(len(setTmp)):
+                    if (elem < len(setTmp)-1):
+                        string += str(setTmp[elem]) + ','
+                    else:
+                        string += str(setTmp[elem]) + '}'
         return string
 
         
