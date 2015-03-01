@@ -372,7 +372,7 @@ class EntradaSalida:
                 nuevo = bool(nuevo)
             TS.update(self.exp.valor,nuevo,valores[1])
         else:
-            string = self.exp.evaluate(line)
+            string = str(self.exp.evaluate(line))
             if (self.flag == 'print'):
                 print string, # La coma está para que no se vaya a una nueva línea
             else:
@@ -618,7 +618,7 @@ class Simple:
     def printSymTable(self,tabs):
         return ''
 
-    def evaluate(self):
+    def evaluate(self,line):
         global TS
         if (self.tipo == 'int'):
             return self.valor
@@ -970,6 +970,12 @@ class ListaImpresion:
 
     def printSymTable(self,tabs):
         return ''
+
+    def evaluate(self,line):
+        string = str(self.listExp.evaluate(line))
+        string += str(self.exp.evaluate(line))
+        return string
+
         
 precedence = (
     # Precedencia del if
