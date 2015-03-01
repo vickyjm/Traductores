@@ -147,6 +147,13 @@ class Condicional:
             string += self.inst2.printSymTable(tabs)
         return string
 
+    def execute(self,line):
+        if (self.cond.evaluate(line)):
+            self.inst.execute(line)
+        else:
+            if (self.inst2 != None):
+                self.inst2.execute(line)
+
 class Asignacion:
     def __init__(self,var,valor,linea,columna):
         self.var = var
@@ -204,6 +211,12 @@ class Asignacion:
 
     def printSymTable(self,tabs):
         return ''
+
+    def execute(self,line):
+        global TS
+        valAct = TS.lookup(self.var.valor)
+        valNuevo = self.valor.evaluate(line)
+        TS.update(self.var.valor,valNuevo,valAct[1]) # ID viejo, valor nuevo y tipo viejo
 
 class For:
     def __init__(self, id1, direc, exp, inst,linea,columna):
@@ -344,6 +357,43 @@ class EntradaSalida:
 
     def printSymTable(self,tabs):
         return ''
+
+    def execute(self,line):
+        global TS
+        if (self.flag == 'scan'):
+            valores = TS.lookup(self.exp.valor)
+            esValido = False
+            while not(esValido):
+                nuevo = raw_input()
+                esValido = self.esValido(valores[1],nuevo)
+            if (valores[1] == 'int'):
+                nuevo = int(nuevo)
+            else:
+                nuevo = bool(nuevo)
+            TS.update(self.exp.valor,nuevo,valores[1])
+        else:
+            string = self.exp.evaluate(line)
+            if (self.flag == 'print'):
+                print string, # La coma está para que no se vaya a una nueva línea
+            else:
+                print string
+
+    def esValido(self, tipo, nuevo):
+        try:
+            if (tipo == 'int'):
+                nuevo = int(nuevo)
+                if ((nuevo > 2147483647) or (nuevo < -2147483648)):
+                    print "ERROR: El número ingresado no puede representarse en 32 bits"
+                    return False
+            else:
+                if (nuevo!='true') and (nuevo!='false'):
+                    print "ERROR: Los valores válidos para un booleano son true y false"
+                    return False
+            return True
+        except ValueError:
+            print "ERROR: Valor erróneo para una variable de tipo int"
+            return False
+
 
 class Opbin:
     def __init__(self,izq,op,der,linea,columna):
@@ -720,6 +770,24 @@ class CadenaString:
     def printSymTable(self,tabs):
         return ''
 
+    def evaluate(self,line):
+        string = ""
+        i = 0
+        while (i < len(self.string)):
+            if (self.string[i]=='\\'):
+                if (self.string[i+1]=='n'):
+                    string += '\n'
+                elif (self.string[i+1]=='"'):
+                    string += '"'
+                elif (self.string[i+1]=='\\'):
+                    string += '\\'
+                i = i + 2
+            else:
+                string += self.string[i]
+                i = i + 1
+        return string
+
+
 class ListaInstruccion:
     def __init__(self,inst1,inst2):
         self.inst1 = inst1
@@ -737,12 +805,16 @@ class ListaInstruccion:
         if (self.inst2 != None):
             self.inst2.check(line)
         
-
     def printSymTable(self,tabs):
         string = self.inst1.printSymTable(tabs)
         if (self.inst2 != None):
             string += self.inst2.printSymTable(tabs)
         return string
+
+    def execute(self,line):
+        self.inst1.execute(line)
+        if (self.inst2 != None):
+            self.inst2.execute(line)
 
 class ListaDeclaracion:
     def __init__(self, tipo, idList, decList,linea,columna):
@@ -806,6 +878,22 @@ class ListaDeclaracion:
         if (isinstance(self.decList,ListaDeclaracion)):
             string += self.decList.printSymTable(tabs)
         return string
+
+    def addValues(self,line):
+        global TS
+        valDefecto = {
+            'int'   :   0,
+            'bool'  :   False,
+            'set'   :   set()
+        }
+        lista = self.idList
+        TS.insert(lista.id1.valor,valDefecto.get(self.tipo),self.tipo)
+        if (isinstance(lista.idList,ListaID)):
+            while (lista.idList != None):
+                TS.insert(lista.idList.id1.valor,valDefecto.get(self.tipo),self.tipo)
+                lista = lista.idList
+        if (isinstance(self.decList,ListaDeclaracion)):
+            self.decList.addValues(line)
 
 class ListaID:
     def __init__(self,idList,id1):
