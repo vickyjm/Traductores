@@ -26,6 +26,9 @@ class Program:
     def printSymTable(self,tabs):
         return self.inst.printSymTable(tabs)
 
+    def execute(self,line):
+        self.inst.execute(line)
+
 class Bloque:
     def __init__(self,dec,exp):
         self.exp = exp
@@ -60,6 +63,15 @@ class Bloque:
         if (self.exp != None):
             return self.exp.printSymTable(tabs)
 
+    def execute(self,line):
+        global TS
+        if (self.dec != None):
+            self.dec.addValues(line)
+        if (self.exp != None):
+            self.exp.execute(line)
+        if (self.dec != None):
+            TS = TS.getFather()
+
 class Declarar:
     def __init__(self,lista):
         self.lista = lista
@@ -78,6 +90,10 @@ class Declarar:
     def printSymTable(self,tabs):
         return self.lista.printSymTable(tabs)
 
+    def addValues(self,line):
+        global TS
+        TS = Tabla(TS)
+        self.lista.addValues(line)
 
 class Condicional:
     def __init__(self, cond, inst, inst2,linea,columna):
@@ -551,6 +567,23 @@ class Simple:
 
     def printSymTable(self,tabs):
         return ''
+
+    def evaluate(self):
+        global TS
+        if (self.tipo == 'int'):
+            return self.valor
+        elif (self.tipo == 'bool'):
+            return (self.valor == 'true')
+        elif (self.tipo == 'id'):
+            valores = TS.lookup(self.valor)
+            if (valores[1] == 'int'):
+                return valores[0]
+            elif (valores[1] == 'bool'):
+                return (valores[0]=='true')
+            elif (valores[1] == 'set'):
+                return set(valores[0])
+        else:
+            return set(self.valor)
 
 
 class Repeat:
