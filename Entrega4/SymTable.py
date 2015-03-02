@@ -22,7 +22,7 @@ class Tabla:
 			del self.dic[clave]
 
 	def update(self,clave,valor,tipo):
-		if (clave in self.dic.keys()):
+		if (clave in self.dic.keys()) and (self.dic[clave][1] == tipo):
 			self.dic[clave] = [valor,tipo]
 		else: 
 			if (self.padre != None):
