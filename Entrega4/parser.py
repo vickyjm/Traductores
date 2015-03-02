@@ -826,17 +826,13 @@ class Repeat:
         return string
 
     def execute(self,line):
-        if (self.inst2 != None):
-            while (True):
-                self.inst1.execute(line)
-                if (self.exp.evaluate(line)):
+        while (True):
+            self.inst1.execute(line)
+            if (self.exp.evaluate(line)):
+                if (self.inst2 != None):
                     self.inst2.execute(line)
-                else:
-                    break
-        else:
-            while (self.exp.evaluate(line)):
-                self.inst1.execute(line)
-            
+            else:
+                break            
 
 class Uniop:
     def __init__(self,op,val,linea,columna):
