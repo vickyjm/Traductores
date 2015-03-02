@@ -682,7 +682,7 @@ class Opbin:
                     exit(0)
                 res.add(num * elem)
         elif (self.op == '</>'):
-            if (self.der.evaluate(line) == 0):
+            if (self.izq.evaluate(line) == 0):
                 print "ERROR: división por cero en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                 exit(0)
             aux = self.der.evaluate(line)
@@ -694,7 +694,7 @@ class Opbin:
                     exit(0)
                 res.add(num / elem)
         elif (self.op == '<%>'):
-            if (self.der.evaluate(line) == 0):
+            if (self.izq.evaluate(line) == 0):
                 print "ERROR: división por cero en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                 exit(0)
             aux = self.der.evaluate(line)
