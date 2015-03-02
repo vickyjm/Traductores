@@ -754,12 +754,7 @@ class Simple:
             return (self.valor == 'true')
         elif (self.tipo == 'id'):
             valores = TS.lookup(self.valor)
-            if (valores[1] == 'int') or (valores[1] == 'iter'):
-                return valores[0]
-            elif (valores[1] == 'bool'):
-                return (valores[0]=='true')
-            elif (valores[1] == 'set'):
-                return valores[0]
+            return valores[0]
         else:
             if (self.valor == None): # Caso de conjunto vacío
                 return set()
