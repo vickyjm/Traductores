@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
 
 ##########################################
-# CI3715 Traductores e Interpretadores   #
-# Entrega 3. Grupo 6                     #
+# CI3725 Traductores e Interpretadores   #
+# Entrega 4. Grupo 6                     #
 # Maria Victoria Jorge 11-10495          #
 # Enrique Iglesias 11-10477              # 
 ##########################################
