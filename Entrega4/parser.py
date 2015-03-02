@@ -280,17 +280,26 @@ class For:
         global TS
         TS = Tabla(TS)
         TS.insert(self.id1.valor,0,'iter') #Tipo especial para la variable de iteración del For
-        valAct = TS.lookup(self.exp.valor)
-        if (self.direc == 'max'):
-            valAct[0] = sorted(valAct[0],reverse = True)
+        if (isinstance(self.exp,Simple)):
+            valAct = TS.lookup(self.exp.valor)
+            if (valAct != None):
+                arreglo = valAct[0]
+            else:
+                arreglo = self.exp.evaluate(line)
         else:
-            valAct[0] = sorted(valAct[0])
-        TS.update(self.exp.valor,set(valAct[0]),valAct[1])   
-        for x in valAct[0]:
+            arreglo = self.exp.evaluate(line)
+        if (self.direc == 'max'):
+            arreglo = sorted(arreglo,reverse = True)
+        else:
+            arreglo = sorted(arreglo)
+        for x in arreglo:
             TS.update(self.id1.valor,x,'iter')
             self.inst.execute(line)
+
+        if ((isinstance(self.exp,Simple)) and (valAct != None)):
+            TS.update(self.exp.valor,set(arreglo),valAct[1])
         TS = TS.getFather()
-        
+
 class While:
     def __init__(self,exp,inst,linea,columna):
         self.exp = exp
