@@ -280,8 +280,13 @@ class For:
         global TS
         TS = Tabla(TS)
         TS.insert(self.id1.valor,0,'iter') #Tipo especial para la variable de iteración del For
-
-        # AQUI TIENES QUE PONER LO QUE HACE QUE SE EJECUTE LA INSTRUCCION FOR
+        if (self.direc == 'max'):
+            self.exp.valor = sorted(self.exp.valor,reverse = True)
+        else:
+            self.exp.valor.sort() 
+        for x in self.exp:
+            TS.update(self.id1,x,self.id1.tipo)
+            self.inst.execute(line)
 
         TS = TS.getFather()
 class While:
@@ -326,6 +331,10 @@ class While:
 
     def printSymTable(self,tabs):
         return self.inst.printSymTable(tabs)
+
+    def execute(self,line):
+        while (self.exp.evaluate(line)):
+            self.inst.execute(line)
 
 class EntradaSalida:
     def __init__(self,flag,exp,linea,columna):
@@ -809,6 +818,19 @@ class Repeat:
         if (self.inst2 != None):
             string += self.inst2.printSymTable(tabs)
         return string
+
+    def execute(self,line):
+        if (self.inst2 != None):
+            while (True):
+                self.inst1.execute(line)
+                if (self.exp.evaluate(line)):
+                    self.inst2.execute(line)
+                else:
+                    break
+        else:
+            while (self.exp.evaluate(line)):
+                self.inst1.execute(line)
+            
 
 class Uniop:
     def __init__(self,op,val,linea,columna):
