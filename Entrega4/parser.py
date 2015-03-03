@@ -413,6 +413,8 @@ class EntradaSalida:
                             string += str(setTmp[elem]) + ','
                         else:
                             string += str(setTmp[elem]) + '}'
+            elif (isinstance(aux,bool)):
+                string += str(aux).lower()
             else:
                 string += str(aux)
             if (self.flag == 'print'):
@@ -1185,6 +1187,8 @@ class ListaImpresion:
                         string += str(setTmp[elem]) + ','
                     else:
                         string += str(setTmp[elem]) + '}'
+        elif (isinstance(aux,bool)):
+                string += str(aux).lower()
         else:
             string += str(aux)
         return string
