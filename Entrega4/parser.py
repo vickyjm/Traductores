@@ -399,7 +399,22 @@ class EntradaSalida:
                 nuevo = bool(nuevo)
             TS.update(self.exp.valor,nuevo,valores[1])
         else:
-            string = str(self.exp.evaluate(line))
+            string = ""
+            aux = self.exp.evaluate(line)
+            if (isinstance(aux,set)):
+                setTmp = list(aux)
+                setTmp.sort()
+                if (setTmp == []):
+                    string += '{}'
+                else:
+                    string += '{'
+                    for elem in range(len(setTmp)):
+                        if (elem < len(setTmp)-1):
+                            string += str(setTmp[elem]) + ','
+                        else:
+                            string += str(setTmp[elem]) + '}'
+            else:
+                string += str(aux)
             if (self.flag == 'print'):
                 print string, # La coma está para que no se vaya a una nueva línea
             else:
@@ -1170,6 +1185,8 @@ class ListaImpresion:
                         string += str(setTmp[elem]) + ','
                     else:
                         string += str(setTmp[elem]) + '}'
+        else:
+            string += str(aux)
         return string
 
         
