@@ -292,12 +292,11 @@ class For:
             arreglo = sorted(arreglo,reverse = True)
         else:
             arreglo = sorted(arreglo)
+        if ((isinstance(self.exp,Simple)) and (valAct != None)):
+            TS.update(self.exp.valor,set(arreglo),valAct[1])
         for x in arreglo:
             TS.update(self.id1.valor,x,'iter')
             self.inst.execute(line)
-
-        if ((isinstance(self.exp,Simple)) and (valAct != None)):
-            TS.update(self.exp.valor,set(arreglo),valAct[1])
         TS = TS.getFather()
 
 class While:
