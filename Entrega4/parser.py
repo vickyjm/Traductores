@@ -630,8 +630,6 @@ class Opbin:
         return ''
 
     def evaluate(self,line):
-        global TS
-        print "Operación "+str(self.op)+ " Tabla "+str(TS.dic)
         if (self.op == '+'):
             res = self.izq.evaluate(line) + self.der.evaluate(line)
             if ((res > 2147483647) or (res < -2147483648)):
