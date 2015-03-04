@@ -1172,7 +1172,23 @@ class ListaImpresion:
         return ''
 
     def evaluate(self,line):
-        string = str(self.listExp.evaluate(line))
+        string = self.listExp.evaluate(line)
+        if (isinstance(string,set)):
+            setTmp = list(string)
+            setTmp.sort()
+            if (setTmp == []):
+                string = '{}'
+            else:
+                string = '{'
+                for elem in range(len(setTmp)):
+                    if (elem < len(setTmp)-1):
+                        string += str(setTmp[elem]) + ','
+                    else:
+                        string += str(setTmp[elem]) + '}'
+        elif (isinstance(string,bool)):
+            string = str(string).lower()
+        else:
+            string = str(string)
         aux = self.exp.evaluate(line)
         if (isinstance(aux,set)):
             setTmp = list(aux)
