@@ -630,6 +630,8 @@ class Opbin:
         return ''
 
     def evaluate(self,line):
+        global TS
+        print "Operación "+str(self.op)+ " Tabla "+str(TS.dic)
         if (self.op == '+'):
             res = self.izq.evaluate(line) + self.der.evaluate(line)
             if ((res > 2147483647) or (res < -2147483648)):
@@ -662,16 +664,16 @@ class Opbin:
                 print "ERROR: se produjo overflow en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                 exit(0)
         elif (self.op == '++'):
-            res = self.izq.evaluate(line)
+            res = self.izq.evaluate(line).copy()
             res |= self.der.evaluate(line)
         elif (self.op == '><'):
-            res = self.izq.evaluate(line)
+            res = self.izq.evaluate(line).copy()
             res &= self.der.evaluate(line)
         elif (self.op == '\\'):
-            res = self.izq.evaluate(line)
+            res = self.izq.evaluate(line).copy()
             res -= self.der.evaluate(line)
         elif (self.op == '<+>'):
-            aux = self.der.evaluate(line)
+            aux = self.der.evaluate(line).copy()
             num = self.izq.evaluate(line)
             res = set()
             for elem in aux:
@@ -680,7 +682,7 @@ class Opbin:
                     exit(0)
                 res.add(num + elem)
         elif (self.op == '<->'):
-            aux = self.der.evaluate(line)
+            aux = self.der.evaluate(line).copy()
             num = self.izq.evaluate(line)
             res = set()
             for elem in aux:
@@ -689,7 +691,7 @@ class Opbin:
                     exit(0)
                 res.add(num - elem)
         elif (self.op == '<*>'):
-            aux = self.der.evaluate(line)
+            aux = self.der.evaluate(line).copy()
             num = self.izq.evaluate(line)
             res = set()
             for elem in aux:
@@ -701,7 +703,7 @@ class Opbin:
             if (self.izq.evaluate(line) == 0):
                 print "ERROR: división por cero en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                 exit(0)
-            aux = self.der.evaluate(line)
+            aux = self.der.evaluate(line).copy()
             num = self.izq.evaluate(line)
             res = set()
             for elem in aux:
@@ -713,7 +715,7 @@ class Opbin:
             if (self.izq.evaluate(line) == 0):
                 print "ERROR: división por cero en la linea "+str(self.linea - line)+", columna "+str(self.colum)
                 exit(0)
-            aux = self.der.evaluate(line)
+            aux = self.der.evaluate(line).copy()
             num = self.izq.evaluate(line)
             res = set()
             for elem in aux:
