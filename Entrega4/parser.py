@@ -15,6 +15,8 @@ errorDeclaracion = []
 
 class Program:
     def __init__(self,inst):
+        global TS
+        TS = Tabla(TS)
         self.inst = inst
 
     def toString(self,tabs):
@@ -91,8 +93,6 @@ class Declarar:
         return self.lista.printSymTable(tabs)
 
     def addValues(self,line):
-        global TS
-        TS = Tabla(TS)
         self.lista.addValues(line)
 
 class Condicional:
