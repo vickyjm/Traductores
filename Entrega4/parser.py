@@ -785,7 +785,7 @@ class Simple:
                 return set()
             if not(isinstance(self.valor,ListaNumero)): # Caso que es un singleton
                 res = set()
-                res.add(self.valor.valor)
+                res.add(self.valor.evaluate(line))
                 return res
             return self.valor.evaluate(line)
 
