@@ -783,6 +783,10 @@ class Simple:
         else:
             if (self.valor == None): # Caso de conjunto vacío
                 return set()
+            if not(isinstance(self.valor,ListaNumero)): # Caso que es un singleton
+                res = set()
+                res.add(self.valor.valor)
+                return res
             return self.valor.evaluate(line)
 
 
